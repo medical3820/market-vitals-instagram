@@ -1,0 +1,44 @@
+name: 수치 기록
+
+# 매일 밤 팔로워·게시물 수치를 metrics/ 에 기록한다. GitHub 예약은 몇 시간 늦게 돌 수 있지만 기록용이라 상관없다.
+# 주간 리포트(클라우드 예약 작업, 월요일 아침)가 이 파일을 읽어 추세를 정리한다.
+
+on:
+  schedule:
+    - cron: "0 13 * * *"   # 22:00 KST
+  workflow_dispatch:
+
+concurrency:
+  group: metrics
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 수치 조회
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: node scripts/metrics.mjs
+
+      - name: 저장소에 올리기
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add metrics/
+          git diff --cached --quiet && exit 0
+          git commit -m "수치 기록 $(TZ=Asia/Seoul date +%F)"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && break; sleep 3; done
