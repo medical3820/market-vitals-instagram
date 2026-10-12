@@ -5,7 +5,8 @@
 // 사용: node scripts/fetch_market.mjs [출력경로=market.json]
 // Node 20+ (내장 fetch). 실패한 항목은 null 로 남기고 errors 배열에 사유를 적는다 — 추정값으로 채우지 않는다.
 
-import { writeFileSync } from "node:fs";
+import { writeFileSync, mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 
 const OUT = process.argv[2] || "market.json";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36";
@@ -187,6 +188,7 @@ const out = {
   events,
   errors,
 };
+mkdirSync(dirname(OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify(out, null, 2));
 console.log(`저장: ${OUT} (오류 ${errors.length}건)`);
 for (const e of errors) console.log("  - " + e);
