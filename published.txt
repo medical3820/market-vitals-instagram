@@ -1,1 +1,4 @@
 # 발행 기록 (scripts/publish.py 가 자동으로 적음)
+MV20261013  media_id=18025706945877132  comment=ok  2026-10-12T22:07:49Z
+MV20261013_R  media_id=18074684162584493  comment=manual  2026-10-12T22:08:33Z
+MV20261013_S  media_id=18117487901279649  comment=manual  2026-10-12T22:08:46Z
