@@ -1,0 +1,48 @@
+name: 뉴스 후보 수집
+
+# 클라우드 예약 작업은 언론사 사이트에 접속할 수 없어서, RSS 후보 수집을 여기서 대신한다.
+# 흐름: 예약 작업이 inbox/<날짜>.request 를 push → 이 워크플로가 RSS를 모아 inbox/<날짜>.candidates.txt 를 main 에 올림
+#       → 예약 작업이 그 목록에서 뉴스를 고름 → inbox/<날짜>.json push → daily.yml 이 카드를 만들고 발행
+# .request / .candidates.txt 는 daily.yml 의 트리거(inbox/*.json)에 걸리지 않는다.
+
+on:
+  push:
+    paths:
+      - "inbox/*.request"
+  workflow_dispatch:
+
+concurrency:
+  group: news-candidates
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: RSS 후보 수집
+        id: c
+        run: |
+          D=$(TZ=Asia/Seoul date +%F)
+          echo "date=$D" >> "$GITHUB_OUTPUT"
+          node scripts/news_candidates.mjs "$D" > "inbox/$D.candidates.txt"
+          head -3 "inbox/$D.candidates.txt"
+
+      - name: 저장소에 올리기
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "inbox/${{ steps.c.outputs.date }}.candidates.txt"
+          git commit -m "뉴스 후보 ${{ steps.c.outputs.date }}" || exit 0
+          for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && break; sleep 3; done

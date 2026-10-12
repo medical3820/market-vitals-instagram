@@ -12,18 +12,18 @@
 
 ## 순서
 1. `TZ=Asia/Seoul date +%F` 로 오늘 날짜를 확인합니다. 토·일요일이면 아무것도 하지 않고 끝냅니다. 같은 날짜의 `inbox/<날짜>.json` 이 이미 있으면 끝냅니다(중복 발행 방지).
-2. 뉴스 후보를 모읍니다. WebFetch로 아래 RSS를 읽되, 프롬프트는 "모든 item의 pubDate와 title과 link를 해석 없이 그대로 목록으로"로 합니다. 전날 15:30(KST) 이후 기사만 봅니다.
-   - https://www.yna.co.kr/rss/economy.xml
-   - https://www.yna.co.kr/rss/market.xml
-   - https://www.yna.co.kr/rss/international.xml
-   - https://www.hankyung.com/feed/economy
-   - https://www.hankyung.com/feed/international
-   - https://www.hankyung.com/feed/finance
-   - https://www.mk.co.kr/rss/50200011/
-   RSS가 열리지 않으면 WebSearch("뉴욕증시 마감", "코스피 마감 외국인", "국채금리", "원달러 환율", "연준", "수출")로 보완합니다.
+2. 뉴스 후보를 받습니다. 이 환경에서는 언론사 사이트에 직접 접속이 안 되므로 GitHub Actions에 수집을 맡깁니다.
+   ```bash
+   D=$(TZ=Asia/Seoul date +%F)
+   echo "$D" > inbox/$D.request && git add inbox/$D.request && git commit -q -m "뉴스 후보 요청 $D" && git push -q origin HEAD
+   for i in $(seq 1 30); do git fetch -q origin main && git checkout origin/main -- inbox/$D.candidates.txt 2>/dev/null && break; sleep 10; done
+   head -3 inbox/$D.candidates.txt
+   ```
+   `inbox/<날짜>.candidates.txt` 에 연합뉴스·한국경제·매일경제·머니투데이·파이낸셜뉴스·서울경제·헤럴드경제·동아일보·조선일보·이투데이 RSS에서 모은 "시각 | 언론사 | 제목 | 링크" 목록이 들어옵니다(직전 평일 15:30 KST 이후). 이 목록이 1차 자료입니다. 같은 사실이 서로 다른 언론사 두 곳 이상의 제목에 있으면 교차 확인된 것으로 봅니다.
+   5분이 지나도 파일이 오지 않으면 WebSearch("뉴욕증시 마감", "코스피 마감 외국인", "국채금리", "원달러 환율", "연준", "수출")로 대신 모읍니다.
 3. 해외 3건을 고릅니다: 미국·중국·유럽·일본의 금리, 물가, 고용, 통화정책, 재정·관세 정책, 환율, 원자재, 글로벌 증시 전체 흐름.
 4. 국내 3건을 고릅니다: 한국은행·정부 정책, 국내 금리, 환율, 수출입, 국내 증시 전체 흐름과 투자자 수급, 부동산·가계부채처럼 시장 전체에 영향을 주는 것.
-5. 각 후보를 다른 언론사 기사로 교차 확인합니다(RSS 목록이나 WebSearch). 확인 안 되면 다른 후보로 바꿉니다.
+5. 각 후보를 다른 언론사 기사로 교차 확인합니다. 먼저 후보 목록 안에서 같은 사실을 다룬 다른 언론사 제목을 찾고, 숫자를 쓸 때는 WebSearch로 두 곳의 값이 같은지 확인합니다. 확인 안 되면 다른 후보로 바꿉니다. 시장 흐름이 아니라 단순 일정(휴장 안내 등)인 기사는 뉴스로 고르지 않습니다.
 6. 아래 형식으로 `inbox/<날짜>.json`을 씁니다.
    - `h` 제목: 28자 이내(가능하면 20자 안팎), 명사형으로 끝냅니다. 예: "미 국채금리 5%대 고공행진"
    - `d` 요약: 90자 이내, 두 문장, "~습니다"체.
