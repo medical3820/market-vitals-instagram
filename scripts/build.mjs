@@ -171,16 +171,20 @@ newsCard("국내 경제뉴스", "국내 시장을\n움직인 뉴스", inbox.dome
   const kr = (inbox.schedule_kr || []).filter((x) => x && x.time && x.item)
     .map((x) => ({ at: new Date(`${DATE}T${x.time}:00+09:00`).toISOString(), kstDate: DATE, time: x.time, region: "한국", item: x.item }));
   const all = [...(market.events || []), ...kr].sort((a, b) => a.at.localeCompare(b.at));
-  // 같은 시각·지역은 한 줄로 묶는다 (예: 21:30 미국 CPI · 근원 CPI)
+  // 같은 시각·지역은 한 줄로 묶는다. 대표 지표를 앞에, 두 개까지만 쓰고 나머지는 "외 N건" (예: 21:30 미국 CPI · 근원 CPI)
   const merge = (list, withDate) => {
     const out = [];
     for (const e of list) {
       const t = withDate ? `${md(e.kstDate)} ${e.time}` : (e.kstDate === DATE ? e.time : `익일 ${e.time}`);
       const last = out[out.length - 1];
-      if (last && last.at === e.at && last.region === e.region) { if (!last.item.includes(e.item)) last.item += ` · ${e.item}`; }
-      else out.push({ at: e.at, time: t, region: e.region, item: e.item });
+      if (last && last.at === e.at && last.region === e.region) { if (!last.items.includes(e.item)) last.items.push(e.item); }
+      else out.push({ at: e.at, time: t, region: e.region, items: [e.item] });
     }
-    return out.slice(0, 6).map(({ time, region, item }) => ({ time, region, item }));
+    return out.slice(0, 6).map(({ time, region, items }) => {
+      const sorted = [...items].sort((a, b) => a.startsWith("근원") - b.startsWith("근원"));
+      const item = sorted.slice(0, 2).join(" · ") + (sorted.length > 2 ? ` 외 ${sorted.length - 2}건` : "");
+      return { time, region, item };
+    });
   };
   let items = merge(all.filter((e) => { const t = new Date(e.at).getTime(); return t >= from - 36e5 && t < until; }), false);
   let title = `${mdw(DATE)} 챙겨 볼 일정`;

@@ -189,7 +189,7 @@
 
     outro: c => `${top(c)}<div class="lead">${esc(c.lead)}</div>
       <div class="rules">${c.rules.map(r => `<div>${esc(r)}</div>`).join('')}</div>
-      <div class="handle">${esc(D.handle)}</div>${foot(c)}`,
+      <div class="handle">${esc(D.handle)}</div><div class="foot"><span></span><span class="num">${esc(c.page)}</span></div>`,
   };
 
   document.getElementById('deck').innerHTML = D.cards.map(c =>
