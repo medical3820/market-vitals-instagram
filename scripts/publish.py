@@ -217,6 +217,24 @@ def reel_container(folder, post):
     return cid
 
 
+def story_container(folder, post):
+    """스토리(이미지 1장) 컨테이너를 만들고 FINISHED 까지 기다린 뒤 id 를 돌려준다. DRY_RUN 이면 None.
+    스토리는 캡션이 없으므로 캡션 기준 중복 확인을 하지 않는다 (published.txt 로만 막는다)."""
+    url = "%s/posts/%s/%s" % (RAW_BASE, folder, post["image"])
+    ok, info, length = check_url(url)
+    print("  %-10s %s  (%s, %.2fMB)" % (post["image"], "OK " if ok else "FAIL", info, length / 1024.0 / 1024.0))
+    if not ok:
+        die("스토리 이미지가 열리지 않음: %s" % info)
+    if DRY_RUN:
+        print("\nDRY_RUN=1 이므로 여기서 중단합니다. 스토리 이미지 URL은 정상입니다.")
+        return None
+    r = _request("POST", "%s/media" % IG_USER_ID, {"media_type": "STORIES", "image_url": url})
+    cid = r["id"]
+    print("  스토리 컨테이너 %s" % cid)
+    wait_finished(cid)
+    return cid
+
+
 def due(folder):
     """RESPECT_PUBLISH_AT=1(릴스 예약 실행)일 때: post.json 의 publish_at 이 지났는지.
     publish_at 이 없으면 예약 대상이 아니므로 False."""
@@ -361,7 +379,14 @@ def main():
         die("post.json 을 찾을 수 없습니다: %s" % post_path)
 
     post = json.load(open(post_path, encoding="utf-8"))
-    if post.get("video"):
+    is_story = bool(post.get("story"))
+    if is_story:
+        print("발행 대상: %s (스토리)" % folder)
+        container_id = story_container(folder, post)
+        if container_id is None:
+            return
+        kind = "스토리"
+    elif post.get("video"):
         print("발행 대상: %s (릴스)" % folder)
         container_id = reel_container(folder, post)
         kind = "릴스"
@@ -373,7 +398,7 @@ def main():
 
     # --- 5. 발행 ------------------------------------------------------------
     # 같은 캡션이 이미 계정에 있으면 발행하지 않는다 (기록 누락으로 인한 중복 발행 방지)
-    dup = find_on_instagram(post["caption"])
+    dup = None if is_story else find_on_instagram(post["caption"])
     if dup:
         record(folder, dup, "skip-duplicate")
         print("같은 캡션의 게시물이 이미 있습니다 (media_id=%s). 발행하지 않고 기록만 남깁니다." % dup)
@@ -384,7 +409,7 @@ def main():
     except BaseException as e:
         # 오류 응답이어도 실제로는 올라갔을 수 있다 — 확인 후 기록. 어느 쪽이든 자동 재시도는 막는다.
         time.sleep(20)
-        media_id = find_on_instagram(post["caption"])
+        media_id = None if is_story else find_on_instagram(post["caption"])
         record(folder, media_id or "unknown", "publish-error-check-app")
         print("media_publish 오류: %r — 계정 확인 결과 %s. 자동 재시도하지 않도록 기록했습니다." % (
             e, "발행됨 (media_id=%s)" % media_id if media_id else "발행 안 됨(앱에서 확인 필요)"))

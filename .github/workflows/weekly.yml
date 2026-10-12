@@ -1,0 +1,107 @@
+name: 주간 정리 발행
+
+# 토요일 아침, 한 주(월~금) 지수·금리·환율·원자재 등락과 국내 투자자별 주간 순매수, 다음 주 일정을 캐러셀로 발행한다.
+# 뉴스가 필요 없어 예약 작업 없이 GitHub 예약(cron)으로 돈다. 몇 시간 늦게 돌아도 주말이라 문제없다.
+# 수동 실행은 기본이 '만들어 보기'다. 실제로 올리려면 publish 를 true 로.
+
+on:
+  schedule:
+    - cron: "0 0 * * 6"   # 토 09:00 KST
+  workflow_dispatch:
+    inputs:
+      friday:
+        description: "정리할 주의 금요일 YYYY-MM-DD (비우면 가장 최근 금요일)"
+        required: false
+        default: ""
+      publish:
+        description: "true 면 인스타에 실제 발행. 기본은 카드만 만들어 보기"
+        required: false
+        default: "false"
+
+concurrency:
+  group: market-vitals
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  weekly:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PUBLISH: ${{ github.event_name == 'schedule' || github.event.inputs.publish == 'true' }}
+      FRIDAY: ${{ github.event.inputs.friday }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 도구 설치
+        run: |
+          npm ci --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          sudo apt-get install -y fonts-noto-cjk > /dev/null
+
+      - name: 토큰·계정 확인 (게시물은 올리지 않음)
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          EXPECT_USERNAME: market.vitals
+        run: node scripts/check_token.mjs
+
+      - name: 주간 카드 만들기·검사
+        id: build
+        env:
+          BLOCKLIST: ${{ secrets.BLOCKLIST }}
+        run: node scripts/weekly.mjs
+
+      - name: 이미 발행한 주인지 확인
+        id: dup
+        run: |
+          if grep -q "^${{ steps.build.outputs.folder }} " published.txt; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "이미 발행된 주입니다. 다시 올리지 않습니다."
+          fi
+
+      - name: 이미지 렌더링
+        run: node scripts/render.mjs "${{ steps.build.outputs.folder }}"
+
+      - name: 카드 이미지 보관
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-${{ steps.build.outputs.folder }}
+          path: posts/${{ steps.build.outputs.folder }}/
+
+      - name: 저장소에 올리기
+        if: env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add posts/
+          git commit -m "주간 카드 ${{ steps.build.outputs.folder }}" || true
+          git pull --rebase -q origin main
+          git push origin main
+          sleep 20
+
+      - name: 인스타 발행
+        if: env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true'
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
+        run: python3 scripts/publish.py "${{ steps.build.outputs.folder }}"
+
+      - name: 발행 기록 올리기
+        if: always() && env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true'
+        run: |
+          git add published.txt
+          git diff --cached --quiet && exit 0
+          git commit -m "발행 기록 ${{ steps.build.outputs.folder }}"
+          git pull --rebase -q origin main
+          git push origin main
