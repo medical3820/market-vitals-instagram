@@ -61,7 +61,9 @@ await Promise.all(FEEDS.map(async ([outlet, url]) => {
     for (const m of xml.matchAll(/<item[\s>][\s\S]*?<\/item>/g)) {
       const b = m[0];
       const title = tag(b, "title");
-      const when = new Date(tag(b, "pubDate") || tag(b, "dc:date"));
+      let when = new Date(tag(b, "pubDate") || tag(b, "dc:date"));
+      // 한국 시간을 GMT 로 잘못 표기한 피드(예: 헤럴드경제)는 9시간 미래로 찍힌다 — 미래 시각이면 9시간을 뺀다
+      if (when - Date.now() > 10 * 60 * 1000) when = new Date(when.getTime() - 9 * 3600 * 1000);
       if (!title || isNaN(when) || when < since) continue;
       if (NOISE.test(title) || !MARKET.test(title)) continue;
       items.push({ outlet, when, title, link: tag(b, "link") });

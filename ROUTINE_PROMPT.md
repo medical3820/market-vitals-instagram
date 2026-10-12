@@ -15,7 +15,9 @@
 2. 뉴스 후보를 받습니다. 이 환경에서는 언론사 사이트에 직접 접속이 안 되므로 GitHub Actions에 수집을 맡깁니다.
    ```bash
    D=$(TZ=Asia/Seoul date +%F)
-   echo "$D" > inbox/$D.request && git add inbox/$D.request && git commit -q -m "뉴스 후보 요청 $D" && git push -q origin HEAD
+   git checkout -q main 2>/dev/null; git pull -q --rebase origin main
+   echo "$D" > inbox/$D.request && git add inbox/$D.request && git commit -q -m "뉴스 후보 요청 $D"
+   git push -q origin HEAD:main || { git pull -q --rebase origin main && git push -q origin HEAD:main; } || echo "요청 push 실패"
    for i in $(seq 1 30); do git fetch -q origin main && git checkout origin/main -- inbox/$D.candidates.txt 2>/dev/null && break; sleep 10; done
    head -3 inbox/$D.candidates.txt
    ```
@@ -40,7 +42,7 @@
    }
    ```
 7. `node scripts/check_inbox.mjs inbox/<날짜>.json` 을 실행합니다. "고칠 점"이 나오면 고쳐서 통과할 때까지 반복합니다.
-8. `git add inbox/<날짜>.json && git commit -m "뉴스 <날짜>" && git push` 합니다. 현재 브랜치에 push가 안 되면 `claude/news-<날짜>` 브랜치를 만들어 push합니다. 어느 브랜치든 push되면 발행이 시작됩니다.
+8. `git add inbox/<날짜>.json && git commit -m "뉴스 <날짜>"` 후 `git pull -q --rebase origin main && git push origin HEAD:main` 으로 올립니다. 거부되면 한 번 더 pull --rebase 후 push합니다. 그래도 main 에 안 되면 `claude/news-<날짜>` 브랜치로 push합니다. 어느 브랜치든 push되면 발행이 시작됩니다. push 결과 메시지를 꼭 확인하고, 실패했으면 카톡에 실패로 보고합니다.
 9. 카카오톡(PlayMCP KakaotalkChat-MemoChat)으로 200자 이내 보고를 보냅니다.
    - 성공: "[마켓바이탈 M/D] 뉴스 6건 올림, 발행 진행 중. 결과: https://github.com/medical3820/market-vitals-instagram/actions"
    - 실패: "[마켓바이탈 M/D] 뉴스 작성 실패: (이유 한 줄). 오늘 카드는 발행되지 않습니다."
