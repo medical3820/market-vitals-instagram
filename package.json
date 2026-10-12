@@ -2,7 +2,7 @@
   "name": "market-vitals-instagram",
   "private": true,
   "type": "module",
-  "description": "마켓바이탈(@marketvitals.kr) 개장 전 시황 카드 자동 생성·발행",
+  "description": "마켓바이탈(@market.vitals) 개장 전 시황 카드 자동 생성·발행",
   "scripts": {
     "fetch": "node scripts/fetch_market.mjs work/market.json",
     "build": "node scripts/build.mjs",

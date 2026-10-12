@@ -1,4 +1,4 @@
-# 마켓바이탈 (@marketvitals.kr) 자동 발행
+# 마켓바이탈 (@market.vitals) 자동 발행
 
 평일 아침, 국내외 시장 흐름을 카드뉴스 캐러셀(최대 10장)로 만들어 인스타그램에 올린다. PC가 꺼져 있어도 돈다.
 
@@ -42,7 +42,7 @@ GitHub 예약(cron)은 2~5시간 늦게 돌아서 쓰지 않는다. 예약 작�
 
 ## 처음 설정 (원장님이 직접)
 
-1. 인스타 @marketvitals.kr를 **프로페셔널 계정**(비즈니스 또는 크리에이터)으로 전환.
+1. 인스타 @market.vitals를 **프로페셔널 계정**(비즈니스 또는 크리에이터)으로 전환.
 2. Dr. Kevin 때와 같은 방법으로 이 계정의 **Instagram 사용자 ID와 액세스 토큰** 발급.
 3. 이 저장소 Settings → Secrets and variables → Actions 에 secret 3개:
    - `IG_USER_ID`, `IG_ACCESS_TOKEN`

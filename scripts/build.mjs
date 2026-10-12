@@ -226,7 +226,7 @@ if (hits) fail(`차단 목록 단어가 ${hits}개 발견되었습니다. 발행
 // ── 출력 ──────────────────────────────────────────────────────────────
 const total = cards.length;
 cards.forEach((c, i) => { c.page = `${i + 1} / ${total}`; });
-const data = { id: ID, date: DATE, dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일`, handle: "@marketvitals.kr", cards };
+const data = { id: ID, date: DATE, dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일`, handle: "@market.vitals", cards };
 const altOf = (c, i) => `${i + 1}/${total}장. ${c.label}. ${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}`;
 const post = {
   id: ID, caption, first_comment: "",
