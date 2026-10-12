@@ -55,6 +55,13 @@ jobs:
           npx playwright install --with-deps chromium
           sudo apt-get install -y fonts-noto-cjk > /dev/null
 
+      - name: 토큰·계정 확인 (게시물은 올리지 않음)
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          EXPECT_USERNAME: market.vitals
+        run: node scripts/check_token.mjs
+
       - name: 숫자·일정 수집
         run: node scripts/fetch_market.mjs work/market.json
 
