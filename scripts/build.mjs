@@ -45,6 +45,7 @@ const eok = (won) => { // 원 → "2조 767억" (한국식)
 const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 864e5);
 const fresh = (ymd, maxDays) => ymd && daysBetween(ymd, DATE) >= 0 && daysBetween(ymd, DATE) <= maxDays;
 const fetchedHM = market.fetchedKST.slice(11);
+const fetchedMD = md(market.fetchedKST.slice(0, 10)); // 수집한 날짜 (게시 날짜와 다를 수 있음)
 const fmtVal = (x) => {
   if (x.price == null) return null;
   const d = x.symbol === "BTC-USD" ? 0 : x.symbol === "^TNX" ? 3 : 2;
@@ -125,7 +126,7 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
   add({ type: "rows", label: "금리 · 환율 · 원자재",
     title: [tnx && `미 10년물 ${num(tnx.price, 3)}%`, ok(krw) && `원/달러 ${num(krw.price)}원`].filter(Boolean).join("\n"),
     rows: m.map(row),
-    asof: `금리·달러 ${md(usDate)} 마감 · 그 외 ${md(DATE)} ${fetchedHM}` }, m.length < 4 ? "지표 부족" : null);
+    asof: `금리·달러 ${md(usDate)} 마감 · 그 외 ${fetchedMD} ${fetchedHM}` }, m.length < 4 ? "지표 부족" : null);
 }
 
 // 6 지수선물·아시아
@@ -135,7 +136,7 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
   add({ type: "groups", label: "지수선물 · 아시아",
     title: es && nq ? `미국 선물 S&P ${pct(es.chg)}\n나스닥 ${pct(nq.chg)}` : "개장 전 선물과 아시아",
     groups: [
-      { title: `미국 지수선물 · ${md(DATE)} ${fetchedHM}`, rows: f.map(row) },
+      { title: `미국 지수선물 · ${fetchedMD} ${fetchedHM}`, rows: f.map(row) },
       { title: "아시아 증시 · 최근 마감", rows: a.map((x) => ({ ...row(x), sub: `${x.sub} · ${md(x.date)}` })) },
     ],
     asof: "선물은 전일 정산가 대비" }, f.length < 2 ? "선물 데이터 없음" : null);
@@ -209,16 +210,28 @@ const caption = [
   "",
   `• 미국(${md(usDate)} 마감): S&P 500 ${sign(spx.chg)}${Math.abs(spx.chg).toFixed(2)}%, 나스닥 ${sign(ndx.chg)}${Math.abs(ndx.chg).toFixed(2)}%`,
   `• 코스피(${md(kospi.date)}): ${num(kospi.close)} ${sign(kospi.chg)}${Math.abs(kospi.chg).toFixed(2)}%, 외국인 ${eok(kospi.foreign)}원`,
-  ok(krw) ? `• 원/달러: ${num(krw.price)}원 (${md(DATE)} ${fetchedHM})` : null,
+  ok(krw) ? `• 원/달러: ${num(krw.price)}원 (${fetchedMD} ${fetchedHM})` : null,
   "",
   "카드에서 뉴스·업종 흐름·수급·오늘 일정을 확인하세요.",
+  "저장해 두면 장 시작 전에 다시 보기 편합니다. 매일 아침 받아 보려면 팔로우해 주세요.",
   "",
   "종목 추천을 하지 않습니다. 모든 수치는 카드에 표기된 시점 기준이며, 투자 판단과 책임은 본인에게 있습니다.",
   "운영자는 카드에 언급된 종목을 보유하고 있을 수 있습니다.",
   "자료: Yahoo Finance, 다음 금융(수치), 각 언론 보도(뉴스 요약)",
   "",
-  "#마켓바이탈 #아침시황 #미국증시 #코스피 #환율 #경제뉴스 #주식공부",
+  // 인스타는 관련도 높은 해시태그 3~5개를 권장한다
+  "#마켓바이탈 #미국증시 #코스피 #환율 #경제뉴스",
 ].filter((x) => x !== null).join("\n");
+
+// 첫 댓글: 요일마다 다른 질문으로 댓글 참여를 유도한다 (예측·종목 추천을 묻지 않는 중립 질문)
+const QUESTIONS = [
+  "오늘 카드에서 가장 눈에 띈 지표는 무엇인가요? 댓글로 알려 주세요.",
+  "매일 아침 카드에 더 보고 싶은 지표가 있나요? 댓글로 남겨 주시면 반영해 보겠습니다.",
+  "출근길에 가장 먼저 확인하는 숫자는 무엇인가요? 환율, 금리, 지수 중에서 골라 주세요.",
+  "이번 주 가장 궁금한 경제 일정은 무엇인가요? 댓글로 알려 주세요.",
+  "이번 주 시장에서 가장 크게 느껴진 변화는 무엇이었나요? 댓글로 나눠 주세요.",
+];
+const firstComment = QUESTIONS[(new Date(DATE + "T12:00:00+09:00").getUTCDay() + 6) % 7 % QUESTIONS.length];
 
 // ── 검사: 차단 목록(보유 종목) ─────────────────────────────────────────
 const block = (process.env.BLOCKLIST || "").split(/[,\n]/).map((s) => s.trim()).filter((s) => s.length >= 2);
@@ -233,7 +246,7 @@ cards.forEach((c, i) => { c.page = `${i + 1} / ${total}`; });
 const data = { id: ID, date: DATE, dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일`, handle: "@market.vitals", cards };
 const altOf = (c, i) => `${i + 1}/${total}장. ${c.label}. ${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}`;
 const post = {
-  id: ID, caption, first_comment: "",
+  id: ID, caption, first_comment: firstComment,
   slides: cards.map((c, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, alt_text: altOf(c, i) })),
 };
 mkdirSync(OUTDIR, { recursive: true });
