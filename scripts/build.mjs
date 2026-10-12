@@ -217,7 +217,11 @@ const caption = [
 
 // ── 검사: 차단 목록(보유 종목) ─────────────────────────────────────────
 const block = (process.env.BLOCKLIST || "").split(/[,\n]/).map((s) => s.trim()).filter((s) => s.length >= 2);
-if (!block.length) warnings.push("BLOCKLIST 가 비어 있음 — 보유 종목 검사를 하지 못함");
+if (!block.length) {
+  // 실제 발행 때는 보유 종목 검사 없이 올리지 않는다 (Secrets 등록을 깜빡한 경우)
+  if (process.env.PUBLISH === "true") fail("BLOCKLIST secret 이 비어 있습니다. 보유 종목 검사 없이는 발행하지 않습니다.");
+  warnings.push("BLOCKLIST 가 비어 있음 — 보유 종목 검사를 하지 못함 (만들어 보기라 계속)");
+}
 const allText = JSON.stringify(cards) + "\n" + caption;
 const hits = block.filter((w) => allText.toLowerCase().includes(w.toLowerCase())).length;
 if (hits) fail(`차단 목록 단어가 ${hits}개 발견되었습니다. 발행하지 않습니다. (단어는 공개 로그에 출력하지 않음)`);
