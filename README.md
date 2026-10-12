@@ -52,7 +52,7 @@ GitHub 예약(cron)은 2~5시간 늦게 돌아서 쓰지 않는다. 예약 작�
 
 ## 손으로 돌리기
 
-- 카드만 만들어 보기: Actions → 마켓바이탈 발행 → Run workflow (publish=false)
+- 카드만 만들어 보기: Actions → 마켓바이탈 발행 → Run workflow (publish=false). 예약 작업 리허설은 커밋 메시지에 `[연습]`을 넣으면 발행 없이 카드만 만든다
 - 특정 날짜를 실제로 올리기: date 입력 + publish=true (그 날짜의 `inbox/<날짜>.json`이 있어야 뉴스 카드가 들어감)
 
 ## 로컬에서 시험 (윈도, 엣지 사용)

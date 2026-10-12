@@ -33,7 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      PUBLISH: ${{ github.event_name == 'push' || github.event.inputs.publish == 'true' }}
+      # push 는 실제 발행. 단 커밋 메시지에 [연습] 이 있으면 카드만 만든다 (예약 작업 리허설용)
+      PUBLISH: ${{ (github.event_name == 'push' && !contains(github.event.head_commit.message, '[연습]')) || github.event.inputs.publish == 'true' }}
       DATE: ${{ github.event.inputs.date }}
     steps:
       - uses: actions/checkout@v4
