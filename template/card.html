@@ -1,0 +1,199 @@
+<title>마켓바이탈 카드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@500;700;800;900&display=swap">
+<style>
+  /* Layout: 딥그린 바탕의 클린 앱형 카드(최대 10장). 1080x1350(4:5) 기준, 치수는 cqw(카드 너비 1%).
+     등락은 빨강(상승)/파랑(하락) 칩에 흰 글자. 단일 룩(이미지용). 데이터는 #data JSON 하나로 들어온다. */
+  :root{
+    --bg:#0e3b2e;        /* 딥그린 바탕 */
+    --panel:#185040;     /* 타일·막대 트랙 */
+    --fg:#ffffff;        /* 본문 */
+    --dim:#a9d3c2;       /* 보조 글자 */
+    --line:#2b6553;      /* 구분선 */
+    --mark:#7ff0bf;      /* 로고·번호 */
+    --up:#e0313a;
+    --down:#2563eb;
+    --page:#e8eaed;      /* 미리보기 바탕 */
+    --f:"Gothic A1","Pretendard","Noto Sans CJK KR","Noto Sans KR",system-ui,sans-serif;
+    --card-w:100%;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--page);color:#1c1f24;font-family:var(--f);margin:0}
+
+  .shell{max-width:1180px;margin:0 auto;padding-block:28px 44px;padding-left:16px;padding-right:16px}
+  .shell header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin-bottom:18px}
+  .shell h1{font-size:22px;font-weight:900;margin:0}
+  .shell header p{margin:0;color:#5f6670;font-size:13px}
+  .deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:20px}
+
+  .card{width:var(--card-w);aspect-ratio:4/5;max-width:100%;container-type:inline-size;position:relative;overflow:hidden;
+    background:var(--bg);color:var(--fg);box-shadow:0 8px 26px rgba(20,24,30,.14);word-break:keep-all;overflow-wrap:break-word}
+  .in{position:absolute;inset:0;display:flex;flex-direction:column;padding:7cqw 7cqw 6cqw}
+  .num{font-variant-numeric:tabular-nums}
+
+  .top{display:flex;justify-content:space-between;align-items:center;gap:3cqw;font-size:3cqw;font-weight:700;color:var(--dim)}
+  .top b{color:var(--mark);font-weight:900;font-size:3.8cqw;letter-spacing:-.02em}
+  .h{font-size:6.6cqw;font-weight:900;line-height:1.24;letter-spacing:-.045em;margin-top:4.6cqw;white-space:pre-line;text-wrap:balance}
+  .h.xl{font-size:8cqw;margin-top:6.4cqw}
+  .sub{font-size:3.6cqw;color:var(--dim);font-weight:700;margin-top:2.4cqw}
+
+  .chip{display:inline-block;font-size:3cqw;font-weight:800;color:#fff;padding:.7cqw 1.8cqw;border-radius:1.4cqw;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .chip.up{background:var(--up)} .chip.down{background:var(--down)}
+  .chip.flat{background:transparent;color:var(--dim);padding-left:0;padding-right:0}
+
+  /* 커버 타일 */
+  .grid{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:2.4cqw}
+  .tile{background:var(--panel);border-radius:3.2cqw;padding:3.4cqw 3.8cqw}
+  .tile .k{font-size:2.9cqw;font-weight:700;color:var(--dim)}
+  .tile .v{font-size:5.8cqw;font-weight:900;letter-spacing:-.03em;margin-top:1.4cqw}
+  .tile .c{margin-top:1.2cqw;min-height:4.4cqw}
+
+  /* 지표 행 */
+  .rows{margin-top:4.4cqw;display:flex;flex-direction:column}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:3cqw;padding:2.6cqw 0;border-bottom:.25cqw solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .nm{font-size:3.9cqw;font-weight:800;min-width:0}
+  .row .nm small{display:block;font-size:2.6cqw;color:var(--dim);font-weight:700;margin-top:.5cqw}
+  .row .r{display:flex;align-items:center;gap:2.4cqw}
+  .row .v{font-size:4.8cqw;font-weight:900;letter-spacing:-.02em}
+  .row .chip{min-width:15.5cqw;text-align:center}
+  .rows.tight .row{padding:1.7cqw 0}
+  .rows.tight .v{font-size:4.4cqw}
+  .rows.tight .nm{font-size:3.6cqw}
+  .grp{margin-top:3.6cqw}
+  .grp .gt{font-size:2.8cqw;font-weight:800;color:var(--mark);letter-spacing:.02em}
+  .grp .rows{margin-top:1cqw}
+
+  /* 업종 막대 (0 기준 좌우) */
+  .sect{margin-top:4.4cqw;display:flex;flex-direction:column;gap:1.5cqw}
+  .sb{display:grid;grid-template-columns:19cqw 1fr;align-items:center;gap:2cqw}
+  .sb .who{font-size:3.4cqw;font-weight:800;line-height:1.1}
+  .sb .who small{display:block;font-size:2.3cqw;color:var(--dim);font-weight:700}
+  .axis{position:relative;height:5cqw}
+  .axis::before{content:"";position:absolute;left:50%;top:-.6cqw;bottom:-.6cqw;border-left:.25cqw solid var(--dim)}
+  .axis .f{position:absolute;top:.6cqw;bottom:.6cqw;border-radius:.8cqw}
+  .axis .f.up{background:var(--up);left:50%} .axis .f.down{background:var(--down);right:50%}
+  .axis .t{position:absolute;top:50%;transform:translateY(-50%);font-size:2.9cqw;font-weight:900;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .note{margin-top:3cqw;font-size:2.6cqw;color:var(--dim);font-weight:500;line-height:1.5}
+
+  /* 수급 */
+  .flows{margin-top:3.2cqw;display:grid;grid-template-columns:1fr 1fr;gap:2.4cqw}
+  .fl{background:var(--panel);border-radius:3cqw;padding:3.2cqw 3.4cqw}
+  .fl .mk{font-size:3cqw;font-weight:900;color:var(--mark)}
+  .fl .it{margin-top:2cqw}
+  .fl .it .nm{display:flex;justify-content:space-between;font-size:2.9cqw;font-weight:800}
+  .fl .it .nm span:last-child{font-variant-numeric:tabular-nums}
+  .fl .it .nm .up{color:#ff8b8f} .fl .it .nm .down{color:#8fb4ff}
+  .fl .ax{position:relative;height:2.6cqw;margin-top:1cqw}
+  .fl .ax::before{content:"";position:absolute;left:50%;top:-.3cqw;bottom:-.3cqw;border-left:.2cqw solid var(--dim)}
+  .fl .ax .f{position:absolute;top:0;bottom:0;border-radius:.6cqw}
+  .fl .ax .f.up{background:var(--up);left:50%} .fl .ax .f.down{background:var(--down);right:50%}
+
+  /* 뉴스 */
+  .news{margin-top:3.2cqw;display:flex;flex-direction:column}
+  .nw{display:grid;grid-template-columns:6cqw 1fr;gap:2.2cqw;padding:2.6cqw 0;border-bottom:.25cqw solid var(--line)}
+  .nw:last-child{border-bottom:0}
+  .nw .n{font-size:5cqw;font-weight:900;color:var(--mark);line-height:1}
+  .nw .hh{font-size:3.7cqw;font-weight:800;line-height:1.3}
+  .nw .d{font-size:2.85cqw;color:var(--dim);font-weight:500;line-height:1.5;margin-top:.7cqw}
+  .nw .s{font-size:2.3cqw;color:var(--dim);font-weight:700;margin-top:.6cqw;opacity:.85}
+
+  /* 일정 */
+  .sched{margin-top:4.4cqw;display:flex;flex-direction:column}
+  .sc{display:grid;grid-template-columns:auto 1fr auto;gap:3cqw;align-items:center;padding:3cqw 0;border-bottom:.25cqw solid var(--line)}
+  .sc:last-child{border-bottom:0}
+  .sc .tm{font-size:4.2cqw;font-weight:900;font-variant-numeric:tabular-nums;white-space:nowrap;min-width:12cqw}
+  .sc .it{font-size:3.6cqw;font-weight:700;line-height:1.35}
+  .sc .rg{font-size:2.6cqw;font-weight:800;color:var(--bg);background:var(--mark);border-radius:1.2cqw;padding:.6cqw 1.6cqw;white-space:nowrap}
+
+  /* 마무리 */
+  .lead{font-size:7.8cqw;font-weight:900;line-height:1.3;letter-spacing:-.045em;margin-top:9cqw;white-space:pre-line}
+  .rules{margin-top:6cqw;display:flex;flex-direction:column;gap:2.4cqw}
+  .rules div{background:var(--panel);border-radius:2.4cqw;padding:3.4cqw 4cqw;font-size:3.6cqw;font-weight:700}
+  .handle{margin-top:auto;font-size:4.6cqw;font-weight:900;color:var(--mark);letter-spacing:-.02em}
+
+  .foot{margin-top:auto;padding-top:2.6cqw;display:flex;justify-content:space-between;align-items:flex-end;gap:3cqw;font-size:2.4cqw;color:var(--dim);font-weight:700;line-height:1.4}
+  .foot span:last-child{white-space:nowrap}
+  .cover .foot,.outro .foot{margin-top:3cqw}
+
+  /* 렌더 모드: 렌더러가 html.render + --card-w:1080px 로 한 장씩 촬영 */
+  .render body{background:var(--bg)}
+  .render .shell{max-width:none;padding:0}
+  .render .shell header{display:none}
+  .render .deck{display:block}
+  .render .card{box-shadow:none}
+</style>
+
+<div class="shell">
+  <header>
+    <h1>마켓바이탈 카드</h1>
+    <p id="meta"></p>
+  </header>
+  <div class="deck" id="deck"></div>
+</div>
+
+<script id="data" type="application/json">/*DATA*/</script>
+
+<script>
+(function(){
+  const D = JSON.parse(document.getElementById('data').textContent);
+  document.getElementById('meta').textContent = `${D.date} · 1080×1350 캐러셀 ${D.cards.length}장`;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const dir = c => c == null ? 'flat' : c > 0 ? 'up' : c < 0 ? 'down' : 'flat';
+  const pct = c => `${c > 0 ? '▲ ' : c < 0 ? '▼ ' : ''}${Math.abs(c).toFixed(2)}%`;
+  const chip = (c, empty) => c == null ? (empty ? `<span class="chip flat">${esc(empty)}</span>` : '') : `<span class="chip ${dir(c)}">${pct(c)}</span>`;
+  const top = c => `<div class="top"><b>${esc(c.label)}</b><span class="num">${esc(D.dateLabel)}</span></div>`;
+  const foot = c => `<div class="foot"><span>${c.asof ? '기준: ' + esc(c.asof) : esc(D.handle)}</span><span class="num">${esc(c.page)}</span></div>`;
+  const rows = (list, cls = '') => `<div class="rows ${cls}">${list.map(r => `
+    <div class="row"><div class="nm">${esc(r.name)}${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</div>
+    <div class="r"><span class="v num">${esc(r.value)}</span>${chip(r.chg)}</div></div>`).join('')}</div>`;
+
+  const R = {
+    cover: c => `${top(c)}<div class="h xl">${esc(c.headline)}</div><div class="sub">${esc(c.sub)}</div>
+      <div class="grid">${c.tiles.map(t => `<div class="tile"><div class="k">${esc(t.name)}</div>
+        <div class="v num">${esc(t.value)}</div><div class="c">${chip(t.chg)}</div></div>`).join('')}</div>${foot(c)}`,
+
+    rows: c => `${top(c)}<div class="h">${esc(c.title)}</div>${rows(c.rows, c.rows.length > 5 ? 'tight' : '')}${foot(c)}`,
+
+    groups: c => `${top(c)}<div class="h">${esc(c.title)}</div>${c.groups.map(g => `
+      <div class="grp"><div class="gt">${esc(g.title)}</div>${rows(g.rows, 'tight')}</div>`).join('')}${foot(c)}`,
+
+    bars: c => {
+      const max = Math.max(...c.items.map(i => Math.abs(i.chg)), 0.01);
+      return `${top(c)}<div class="h">${esc(c.title)}</div><div class="sect">${c.items.map(i => {
+        const w = Math.abs(i.chg) / max * 34, d = dir(i.chg);
+        const pos = i.chg >= 0 ? `left:calc(50% + ${w}% + 1.4cqw)` : `right:calc(50% + ${w}% + 1.4cqw)`;
+        return `<div class="sb"><div class="who">${esc(i.name)}<small>${esc(i.sub)}</small></div>
+          <div class="axis"><div class="f ${d}" style="width:${w}%"></div><div class="t" style="${pos}">${(i.chg > 0 ? '+' : '') + i.chg.toFixed(2)}%</div></div></div>`;
+      }).join('')}</div><div class="note">${esc(c.note)}</div>${foot(c)}`;
+    },
+
+    flows: c => `${top(c)}<div class="h">${esc(c.title)}</div>${rows(c.rows)}
+      <div class="flows">${c.flows.map(f => {
+        const max = Math.max(...f.items.map(i => Math.abs(i.value)), 1);
+        return `<div class="fl"><div class="mk">${esc(f.market)}</div>${f.items.map(i => {
+          const w = Math.abs(i.value) / max * 48, d = dir(i.value);
+          return `<div class="it"><div class="nm"><span>${esc(i.name)}</span><span class="${d}">${esc(i.text)}</span></div>
+            <div class="ax"><div class="f ${d}" style="width:${w}%"></div></div></div>`;
+        }).join('')}</div>`;
+      }).join('')}</div>${foot(c)}`,
+
+    news: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="news">${c.items.map((n, i) => `
+      <div class="nw"><div class="n num">${i + 1}</div><div><div class="hh">${esc(n.h)}</div>
+      <div class="d">${esc(n.d)}</div><div class="s">출처: ${esc(n.src)}${n.time ? ' · ' + esc(n.time) : ''}</div></div></div>`).join('')}</div>${foot(c)}`,
+
+    schedule: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="sched">${c.items.map(x => `
+      <div class="sc"><div class="tm">${esc(x.time)}</div><div class="it">${esc(x.item)}</div>${x.region ? `<span class="rg">${esc(x.region)}</span>` : '<span></span>'}</div>`).join('')}</div>${foot(c)}`,
+
+    outro: c => `${top(c)}<div class="lead">${esc(c.lead)}</div>
+      <div class="rules">${c.rules.map(r => `<div>${esc(r)}</div>`).join('')}</div>
+      <div class="handle">${esc(D.handle)}</div>${foot(c)}`,
+  };
+
+  document.getElementById('deck').innerHTML = D.cards.map(c =>
+    `<section class="card ${c.type}"><div class="in">${R[c.type](c)}</div></section>`).join('');
+  document.documentElement.dataset.ready = '1';
+})();
+</script>
