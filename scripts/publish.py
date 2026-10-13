@@ -432,7 +432,8 @@ def main():
     lines = open(PUBLISHED, encoding="utf-8").read().split("\n")
     for i in range(len(lines) - 1, -1, -1):
         if lines[i].startswith(folder + "  ") and "comment=pending" in lines[i]:
-            lines[i] = lines[i].replace("comment=pending", "comment=" + ("ok" if comment_ok else "manual"))
+            # 첫 댓글이 원래 없는 게시물(릴스·스토리)은 none, 달려다 실패한 경우만 manual
+            lines[i] = lines[i].replace("comment=pending", "comment=" + ("ok" if comment_ok else ("manual" if comment else "none")))
             break
     open(PUBLISHED, "w", encoding="utf-8").write("\n".join(lines))
 
