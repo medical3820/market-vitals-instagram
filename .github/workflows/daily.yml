@@ -10,6 +10,7 @@ on:
   push:
     paths:
       - "inbox/*.json"
+      - "!inbox/*-pm.json"   # 저녁 뉴스는 evening.yml 이 맡는다
   workflow_dispatch:
     inputs:
       date:

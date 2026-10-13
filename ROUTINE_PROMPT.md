@@ -16,7 +16,8 @@
    ```bash
    D=$(TZ=Asia/Seoul date +%F)
    git checkout -q main 2>/dev/null; git pull -q --rebase origin main
-   echo "$D" > inbox/$D.request && git add inbox/$D.request && git commit -q -m "뉴스 후보 요청 $D"
+   git rm -q --ignore-unmatch inbox/$D.candidates.txt   # 예전 후보 목록이 있으면 지워서 새 목록을 기다린다
+   date -u +%FT%TZ > inbox/$D.request && git add inbox/$D.request && git commit -q -m "뉴스 후보 요청 $D"
    git push -q origin HEAD:main || { git pull -q --rebase origin main && git push -q origin HEAD:main; } || echo "요청 push 실패"
    for i in $(seq 1 30); do git fetch -q origin main && git checkout origin/main -- inbox/$D.candidates.txt 2>/dev/null && break; sleep 10; done
    head -3 inbox/$D.candidates.txt

@@ -17,6 +17,7 @@ if (!id) { console.error("사용: node scripts/make_reel.mjs <폴더ID>"); proce
 const src = join(ROOT, "posts", id);
 const data = JSON.parse(readFileSync(join(src, "data.json"), "utf8"));
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
+const STORY_ONLY = process.env.STORY_ONLY === "1" || data.mode === "pm"; // 저녁은 스토리만 (릴스는 하루 한 번, 아침)
 
 // 릴스에 넣을 카드: 커버 → 해외뉴스 → 미국 → 금리·환율 → 국내 수급 → 일정 → 마무리 (있는 것만)
 const ORDER = [["cover", 3.2], ["news:해외 경제뉴스", 2.8], ["rows:미국 증시", 2.6], ["rows:금리 · 환율 · 원자재", 2.6], ["flows", 2.8], ["schedule", 2.4], ["outro", 1.8]];
@@ -26,11 +27,12 @@ for (const [key, sec] of ORDER) {
   const i = data.cards.findIndex((c) => c.type === type && (!label || c.label === label));
   if (i >= 0) picks.push({ file: join(src, `${String(i + 1).padStart(2, "0")}.jpg`), sec });
 }
-if (picks.length < 3) { console.error("릴스로 만들 카드가 부족합니다."); process.exit(2); }
+if (STORY_ONLY) { picks.length = 0; picks.push({ file: join(src, "01.jpg"), sec: 3 }); }
+else if (picks.length < 3) { console.error("릴스로 만들 카드가 부족합니다."); process.exit(2); }
 
 const [y, m, d] = data.date.split("-");
 const WD = "일월화수목금토"[new Date(data.date + "T12:00:00+09:00").getUTCDay()];
-const head = `${+m}/${+d}(${WD}) 개장 전 시장 요약`;
+const head = `${+m}/${+d}(${WD}) ${data.mode === "pm" ? "장 마감 정리" : "개장 전 시장 요약"}`;
 
 const frameHTML = (img, foot) => `<!doctype html><meta charset="utf-8">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700;900&display=swap">
@@ -60,6 +62,16 @@ async function shot(img, foot, out) {
   await page.screenshot({ path: out, type: "png" });
 }
 const frames = [];
+if (STORY_ONLY) {
+  const S0 = join(ROOT, "posts", `${id}_S`); mkdirSync(S0, { recursive: true });
+  const p = join(work, "story.png");
+  await shot(picks[0].file, data.mode === "pm" ? "오늘 장 마감 카드 전체는 프로필 피드에서" : "오늘 아침 카드 전체는 프로필 피드에서", p);
+  await browser.close();
+  execFileSync(FFMPEG, ["-y", "-loglevel", "error", "-i", p, "-q:v", "3", join(S0, "story.jpg")]);
+  writeFileSync(join(S0, "post.json"), JSON.stringify({ id: `${id}_S`, story: true, image: "story.jpg" }, null, 2));
+  console.log(`스토리만 → posts/${id}_S/`);
+  process.exit(0);
+}
 for (let i = 0; i < picks.length; i++) {
   const out = join(work, `f${i}.png`);
   await shot(picks[i].file, i === 0 ? "카드 전체와 출처는 피드 게시물에서" : `${i + 1} / ${picks.length}`, out);

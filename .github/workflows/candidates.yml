@@ -26,23 +26,34 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: RSS 후보 수집
+      - name: RSS 후보 수집 (이번 push 의 요청 파일마다: <날짜>.request=아침, <날짜>-pm.request=저녁)
         id: c
         run: |
           D=$(TZ=Asia/Seoul date +%F)
+          CHANGED=$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- 'inbox/*.request' 2>/dev/null || true)
+          [ -z "$CHANGED" ] && CHANGED=$(ls inbox/$D*.request 2>/dev/null || true)
+          FILES=""
+          for f in $CHANGED; do
+            [ -f "$f" ] || continue
+            base=$(basename "$f" .request); day=${base%-pm}; mode=""; [ "$base" != "$day" ] && mode=pm
+            node scripts/news_candidates.mjs "$day" $mode > "inbox/$base.candidates.txt"
+            head -1 "inbox/$base.candidates.txt"
+            FILES="$FILES inbox/$base.candidates.txt"
+          done
+          echo "files=$FILES" >> "$GITHUB_OUTPUT"
           echo "date=$D" >> "$GITHUB_OUTPUT"
-          node scripts/news_candidates.mjs "$D" > "inbox/$D.candidates.txt"
-          head -3 "inbox/$D.candidates.txt"
 
       - name: 저장소에 올리기
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add "inbox/${{ steps.c.outputs.date }}.candidates.txt"
+          [ -n "${{ steps.c.outputs.files }}" ] || exit 0
+          git add ${{ steps.c.outputs.files }}
           git commit -m "뉴스 후보 ${{ steps.c.outputs.date }}" || exit 0
           for i in 1 2 3; do git pull --rebase -q origin main && git push -q origin main && break; sleep 3; done

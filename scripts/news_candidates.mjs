@@ -3,10 +3,11 @@
 // 클라우드 예약 작업 환경에서는 언론사 사이트에 접속이 안 되므로, 이 스크립트는 GitHub Actions(candidates.yml)가 돌린다.
 // 예약 작업은 이 목록에서 뉴스를 고르고, 같은 사실이 두 언론사 이상에 있는지 이 목록으로 교차 확인한다.
 //
-// 사용: node scripts/news_candidates.mjs 2026-10-13 > inbox/2026-10-13.candidates.txt
-// 기간: 직전 평일 15:30(KST) ~ 실행 시각. 월요일이면 금요일 15:30부터.
+// 사용: node scripts/news_candidates.mjs 2026-10-13 [pm] > inbox/2026-10-13.candidates.txt
+// 기간: 아침(기본)은 직전 평일 15:30(KST) ~ 실행 시각(월요일이면 금요일 15:30부터), 저녁(pm)은 그날 06:00 ~ 실행 시각.
 
 const DATE = process.argv[2] || new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date());
+const PM = process.argv[3] === "pm";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36";
 
 const FEEDS = [
@@ -38,7 +39,7 @@ const fmt = (d) => new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", mo
 const base = new Date(`${DATE}T12:00:00+09:00`);
 const prev = new Date(base);
 do { prev.setUTCDate(prev.getUTCDate() - 1); } while ([0, 6].includes(new Date(`${kstDay(prev)}T12:00:00+09:00`).getUTCDay()));
-const since = new Date(`${kstDay(prev)}T15:30:00+09:00`);
+const since = PM ? new Date(`${DATE}T06:00:00+09:00`) : new Date(`${kstDay(prev)}T15:30:00+09:00`);
 
 const decode = (s) => s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(+n)).replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16))).replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
 const tag = (block, name) => { const m = block.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`)); return m ? decode(m[1]) : ""; };
@@ -78,7 +79,7 @@ const seen = new Set();
 const uniq = items.sort((a, b) => b.when - a.when).filter((x) => { const k = x.outlet + x.title; if (seen.has(k)) return false; seen.add(k); return true; });
 
 const out = [];
-out.push(`# 뉴스 후보 ${DATE} (기간: ${fmt(since)} ~ ${fmt(new Date())} KST, ${uniq.length}건, 언론사 ${new Set(uniq.map((x) => x.outlet)).size}곳)`);
+out.push(`# 뉴스 후보 ${DATE}${PM ? " 저녁" : ""} (기간: ${fmt(since)} ~ ${fmt(new Date())} KST, ${uniq.length}건, 언론사 ${new Set(uniq.map((x) => x.outlet)).size}곳)`);
 out.push("# 형식: 시각 | 언론사 | 제목 | 링크. 같은 사실이 두 언론사 이상에 있을 때만 뉴스로 쓴다.");
 if (failed.length) out.push("# 수집 실패: " + failed.join(" / "));
 for (const x of uniq) out.push(`${fmt(x.when)} | ${x.outlet} | ${x.title} | ${x.link}`);
