@@ -30,7 +30,7 @@ permissions:
 
 jobs:
   daily:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
       # push 는 실제 발행. 단 커밋 메시지에 [연습] 이 있으면 카드만 만든다 (예약 작업 리허설용)
