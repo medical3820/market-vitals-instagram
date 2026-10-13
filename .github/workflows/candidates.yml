@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: RSS 후보 수집 (이번 push 의 요청 파일마다: <날짜>.request=아침, <날짜>-pm.request=저녁)
+      - name: "RSS 후보 수집 (요청 파일마다 - 날짜.request 는 아침, 날짜-pm.request 는 저녁)"
         id: c
         run: |
           D=$(TZ=Asia/Seoul date +%F)
