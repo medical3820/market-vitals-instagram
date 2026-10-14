@@ -38,6 +38,14 @@ const fmtVal = (x) => `${x.prefix || ""}${num(x.price, x.symbol === "BTC-USD" ? 
 const row = (x) => ({ name: x.name, sub: x.sub || "", value: fmtVal(x), chg: x.chg });
 const hm = market.fetchedKST.slice(11), fmd = md(market.fetchedKST.slice(0, 10));
 const warnings = [], skipped = [], cards = [];
+const BANNED_WHY = ["추천", "수혜", "목표가", "목표주가", "매수 의견", "매도 의견", "팔아라", "급등주", "대장주", "테마주", "관련주", "유망", "호재", "악재", "특징주"];
+// 숫자 카드의 '왜 움직였나' 한 줄: inbox.why.<key> = { t, src }. 규칙에 어긋나면 그 줄만 뺀다.
+const whyOf = (key) => {
+  const w = inbox.why && inbox.why[key];
+  if (!w || !w.t || !w.src) return undefined;
+  if (w.t.length > 40 || !/[·,]/.test(w.src) || BANNED_WHY.find((b) => w.t.includes(b))) { warnings.push(`왜 한 줄(${key}) 규칙 미달로 제외`); return undefined; }
+  return { t: w.t, src: w.src };
+};
 const add = (c, reason) => { if (reason) skipped.push(`${c.label}: ${reason}`); else cards.push(c); };
 
 const krw = market.macro.find((x) => x.symbol === "KRW=X");
@@ -61,7 +69,7 @@ cards.push({ type: "cover", label: "마켓바이탈 마감",
 // 2 국내 마감·수급
 const flow = (mk, r) => r && ({ market: mk, items: [
   { name: "개인", value: r.individual, text: eok(r.individual) }, { name: "외국인", value: r.foreign, text: eok(r.foreign) }, { name: "기관", value: r.institution, text: eok(r.institution) }] });
-cards.push({ type: "flows", label: "국내 증시 · 오늘 마감",
+cards.push({ type: "flows", label: "국내 증시 · 오늘 마감", why: whyOf("kr"),
   title: `${streak}\n기관 ${eok(kospi.institution).replace(/^[+-]/, "")} ${flowWord(kospi.institution)}`,
   rows: [{ name: "코스피", sub: "KOSPI", value: num(kospi.close), chg: kospi.chg }, ...(kosdaq ? [{ name: "코스닥", sub: "KOSDAQ", value: num(kosdaq.close), chg: kosdaq.chg }] : [])],
   flows: [flow("코스피", kospi), flow("코스닥", kosdaq)].filter(Boolean),
@@ -71,7 +79,7 @@ cards.push({ type: "flows", label: "국내 증시 · 오늘 마감",
 {
   const fx = ["KRW=X", "DX-Y.NYB"].map((s) => market.macro.find((x) => x.symbol === s)).filter(ok);
   const asia = market.asia.filter(ok);
-  add({ type: "groups", label: "환율 · 아시아 마감",
+  add({ type: "groups", label: "환율 · 아시아 마감", why: whyOf("fx"),
     title: ok(krw) ? `원/달러 ${num(krw.price)}원\n아시아 증시 마감` : "환율과 아시아 증시",
     groups: [
       { title: `환율 · ${fmd} ${hm}`, rows: fx.map(row) },
@@ -96,7 +104,7 @@ newsCard("해외 경제뉴스", "오늘의 해외\n경제 소식", inbox.global)
 {
   const f = market.futures.filter(ok);
   const vix = market.us.find((x) => x.symbol === "^VIX");
-  add({ type: "rows", label: "미국 지수선물 · 오늘 밤",
+  add({ type: "rows", label: "미국 지수선물 · 오늘 밤", why: whyOf("futures"),
     title: es && nq ? `오늘 밤 미국 선물\nS&P ${pct(es.chg)} · 나스닥 ${pct(nq.chg)}` : "오늘 밤 미국 선물",
     rows: [...f.map(row), ...(ok(vix) ? [{ ...row(vix), sub: `변동성 지수 · ${md(vix.date)} 마감` }] : [])],
     asof: `선물은 ${fmd} ${hm} 기준, 전일 정산가 대비` }, f.length < 2 ? "선물 데이터 없음" : null);
@@ -135,6 +143,11 @@ const caption = [
   ok(krw) ? `• 원/달러 ${num(krw.price)}원 (${hm})` : null,
   tonight ? `• 오늘 밤: ${tonight.items.slice(0, 2).map((x) => `${x.time} ${x.region} ${x.item}`).join(", ")}` : null,
   "",
+  ...(() => { // 주요 뉴스 (카드에 실린 뉴스 제목, 국내 2·해외 2)
+    const pick = (label) => (cards.find((c) => c.type === "news" && c.label === label)?.items || []).slice(0, 2).map((n) => `• ${n.h}`);
+    const lines = [...pick("국내 경제뉴스"), ...pick("해외 경제뉴스")];
+    return lines.length ? ["주요 뉴스", ...lines, ""] : [];
+  })(),
   "카드에서 오늘의 수급·뉴스·오늘 밤 일정을 확인하세요.",
   "저장해 두면 내일 아침 다시 보기 편합니다. 매일 받아 보려면 팔로우해 주세요.",
   "",

@@ -114,6 +114,21 @@
   .rules div{background:var(--panel);border-radius:2.4cqw;padding:3.4cqw 4cqw;font-size:3.6cqw;font-weight:700}
   .handle{margin-top:auto;font-size:4.6cqw;font-weight:900;color:var(--mark);letter-spacing:-.02em}
 
+  /* 왜 움직였나: 숫자 카드 아래 뉴스 근거 한 줄 */
+  .why{margin-top:3cqw;background:var(--panel);border-radius:2.4cqw;padding:2.4cqw 3.4cqw;display:grid;grid-template-columns:auto 1fr;gap:.6cqw 2.4cqw;align-items:baseline}
+  .why b{font-size:2.7cqw;font-weight:900;color:var(--mark);white-space:nowrap}
+  .why span{font-size:3.1cqw;font-weight:700;line-height:1.4}
+  .why small{grid-column:2;font-size:2.3cqw;color:var(--dim);font-weight:700}
+  /* '왜?' 한 줄이 있는 카드는 간격을 좁혀 한 장에 들어가게 */
+  .has-why .h{font-size:6.2cqw;margin-top:3.8cqw}
+  .has-why .rows{margin-top:3.4cqw}
+  .has-why .rows .row{padding:2cqw 0}
+  .has-why .rows.tight .row{padding:1.25cqw 0}
+  .has-why .rows.tight .nm small{display:none}
+  .has-why .flows{margin-top:2.4cqw}
+  .has-why .fl{padding:2.4cqw 3cqw}
+  .has-why .fl .it{margin-top:1.2cqw}
+  .has-why .why{margin-top:2.4cqw}
   .foot{margin-top:auto;padding-top:2.6cqw;display:flex;justify-content:space-between;align-items:flex-end;gap:3cqw;font-size:2.4cqw;color:var(--dim);font-weight:700;line-height:1.4}
   .foot span:last-child{white-space:nowrap}
   .cover .foot,.outro .foot{margin-top:3cqw}
@@ -146,6 +161,7 @@
   const chip = (c, empty) => c == null ? (empty ? `<span class="chip flat">${esc(empty)}</span>` : '') : `<span class="chip ${dir(c)}">${pct(c)}</span>`;
   const top = c => `<div class="top"><b>${esc(c.label)}</b><span class="num">${esc(D.dateLabel)}</span></div>`;
   const foot = c => `<div class="foot"><span>${c.asof ? '기준: ' + esc(c.asof) : esc(D.handle)}</span><span class="num">${esc(c.page)}</span></div>`;
+  const why = c => c.why ? `<div class="why"><b>왜?</b><span>${esc(c.why.t)}</span><small>출처: ${esc(c.why.src)}</small></div>` : '';
   const rows = (list, cls = '') => `<div class="rows ${cls}">${list.map(r => `
     <div class="row"><div class="nm">${esc(r.name)}${r.sub ? `<small>${esc(r.sub)}</small>` : ''}</div>
     <div class="r"><span class="v num">${esc(r.value)}</span>${chip(r.chg)}</div></div>`).join('')}</div>`;
@@ -155,10 +171,10 @@
       <div class="grid">${c.tiles.map(t => `<div class="tile"><div class="k">${esc(t.name)}</div>
         <div class="v num">${esc(t.value)}</div><div class="c">${chip(t.chg)}</div></div>`).join('')}</div>${foot(c)}`,
 
-    rows: c => `${top(c)}<div class="h">${esc(c.title)}</div>${rows(c.rows, c.rows.length > 5 ? 'tight' : '')}${foot(c)}`,
+    rows: c => `${top(c)}<div class="h">${esc(c.title)}</div>${rows(c.rows, c.rows.length > 5 ? 'tight' : '')}${why(c)}${foot(c)}`,
 
     groups: c => `${top(c)}<div class="h">${esc(c.title)}</div>${c.groups.map(g => `
-      <div class="grp"><div class="gt">${esc(g.title)}</div>${rows(g.rows, 'tight')}</div>`).join('')}${foot(c)}`,
+      <div class="grp"><div class="gt">${esc(g.title)}</div>${rows(g.rows, 'tight')}</div>`).join('')}${why(c)}${foot(c)}`,
 
     bars: c => {
       const max = Math.max(...c.items.map(i => Math.abs(i.chg)), 0.01);
@@ -167,7 +183,7 @@
         const pos = i.chg >= 0 ? `left:calc(50% + ${w}% + 1.4cqw)` : `right:calc(50% + ${w}% + 1.4cqw)`;
         return `<div class="sb"><div class="who">${esc(i.name)}<small>${esc(i.sub)}</small></div>
           <div class="axis"><div class="f ${d}" style="width:${w}%"></div><div class="t" style="${pos}">${(i.chg > 0 ? '+' : '') + i.chg.toFixed(2)}%</div></div></div>`;
-      }).join('')}</div><div class="note">${esc(c.note)}</div>${foot(c)}`;
+      }).join('')}</div>${c.why ? why(c) : `<div class="note">${esc(c.note)}</div>`}${foot(c)}`;
     },
 
     flows: c => `${top(c)}<div class="h">${esc(c.title)}</div>${rows(c.rows)}
@@ -178,7 +194,7 @@
           return `<div class="it"><div class="nm"><span>${esc(i.name)}</span><span class="${d}">${esc(i.text)}</span></div>
             <div class="ax"><div class="f ${d}" style="width:${w}%"></div></div></div>`;
         }).join('')}</div>`;
-      }).join('')}</div>${foot(c)}`,
+      }).join('')}</div>${why(c)}${foot(c)}`,
 
     news: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="news">${c.items.map((n, i) => `
       <div class="nw"><div class="n num">${i + 1}</div><div><div class="hh">${esc(n.h)}</div>
@@ -193,7 +209,7 @@
   };
 
   document.getElementById('deck').innerHTML = D.cards.map(c =>
-    `<section class="card ${c.type}"><div class="in">${R[c.type](c)}</div></section>`).join('');
+    `<section class="card ${c.type}${c.why ? ' has-why' : ''}"><div class="in">${R[c.type](c)}</div></section>`).join('');
   document.documentElement.dataset.ready = '1';
 })();
 </script>

@@ -27,6 +27,17 @@ const news = (key, label) => {
 if (!/^\d{4}-\d{2}-\d{2}$/.test(j.date || "")) problems.push("date 가 YYYY-MM-DD 형식이 아닙니다");
 news("global", "해외 뉴스");
 news("domestic", "국내 뉴스");
+if (j.why != null) {
+  const KEYS = ["us", "sectors", "macro", "futures", "kr", "fx"];
+  if (typeof j.why !== "object" || Array.isArray(j.why)) problems.push("why 는 { 키: { t, src } } 형식이어야 합니다");
+  else for (const [k, w] of Object.entries(j.why)) {
+    if (!KEYS.includes(k)) problems.push(`why.${k}: 쓸 수 있는 키는 ${KEYS.join(", ")}`);
+    if (!w || !w.t || !w.src) { problems.push(`why.${k}: t 와 src 가 필요합니다`); continue; }
+    if (w.t.length > 40) problems.push(`why.${k}: ${w.t.length}자 (40자 이내)`);
+    if (!/[·,]/.test(w.src)) problems.push(`why.${k}: 출처가 두 곳 이상이어야 합니다`);
+    const bad = BANNED.filter((b) => w.t.includes(b)); if (bad.length) problems.push(`why.${k}: 쓰면 안 되는 표현 (${bad.join(", ")})`);
+  }
+}
 if (j.schedule_kr != null) {
   if (!Array.isArray(j.schedule_kr)) problems.push("schedule_kr 는 배열이어야 합니다");
   else j.schedule_kr.forEach((x, i) => {

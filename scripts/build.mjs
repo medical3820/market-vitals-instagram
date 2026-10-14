@@ -84,7 +84,17 @@ cards.push({
 });
 
 // 뉴스 카드 공통: 금지 표현이 있는 항목은 뺀다
-const BANNED = ["추천", "수혜", "목표가", "목표주가", "매수 의견", "매도 의견", "팔아라","급등주", "대장주", "테마주", "관련주", "유망", "호재", "악재", "특징주"];
+const BANNED0 = ["추천", "수혜", "목표가", "목표주가", "매수 의견", "매도 의견", "팔아라","급등주", "대장주", "테마주", "관련주", "유망", "호재", "악재", "특징주"];
+const BANNED = BANNED0;
+// 숫자 카드의 '왜 움직였나' 한 줄: inbox.why.<key> = { t, src }. 규칙에 어긋나면 그 줄만 뺀다.
+const whyOf = (key) => {
+  const w = inbox.why && inbox.why[key];
+  if (!w || !w.t || !w.src) return undefined;
+  if (w.t.length > 40) { warnings.push(`왜 한 줄(${key}) 40자 초과로 제외`); return undefined; }
+  if (!/[·,]/.test(w.src)) { warnings.push(`왜 한 줄(${key}) 출처 2곳 미만으로 제외`); return undefined; }
+  if (BANNED.find((b) => w.t.includes(b))) { warnings.push(`왜 한 줄(${key}) 금지 표현으로 제외`); return undefined; }
+  return { t: w.t, src: w.src };
+};
 const newsCard = (label, title, items) => {
   const clean = (items || []).filter((n) => n && n.h && n.d && n.src).filter((n) => {
     const bad = BANNED.find((w) => (n.h + n.d).includes(w));
@@ -104,7 +114,7 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
 {
   const soxNote = ok(sox) && Math.sign(sox.chg) !== Math.sign(ups >= 2 ? 1 : -1)
     ? `\n반도체지수는 ${Math.abs(sox.chg).toFixed(2)}% ${sox.chg >= 0 ? "상승" : "하락"}` : "";
-  add({ type: "rows", label: "미국 증시", title: usLine.replace("뉴욕 ", "") + soxNote,
+  add({ type: "rows", label: "미국 증시", why: whyOf("us"), title: usLine.replace("뉴욕 ", "") + soxNote,
     rows: market.us.filter(ok).map(row), asof: `미국 현지 ${mdw(usDate)} 마감` });
 }
 
@@ -112,7 +122,7 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
 {
   const s = market.sectors.filter((x) => ok(x) && x.date === usDate).sort((a, b) => b.chg - a.chg);
   const top = s[0], bot = s[s.length - 1];
-  add({ type: "bars", label: "미국 업종 흐름",
+  add({ type: "bars", label: "미국 업종 흐름", why: whyOf("sectors"),
     title: s.length ? `${top.name} ${pct(top.chg)} 가장 강세\n${bot.name} ${pct(bot.chg)} 가장 약세` : "",
     items: s.map((x) => ({ name: x.name, sub: x.sub, chg: x.chg })),
     note: "미국은 투자자별 매매가 공개되지 않아 업종 ETF 등락으로 돈의 방향을 봅니다",
@@ -123,7 +133,7 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
 {
   const m = market.macro.filter(ok);
   const tnx = m.find((x) => x.symbol === "^TNX");
-  add({ type: "rows", label: "금리 · 환율 · 원자재",
+  add({ type: "rows", label: "금리 · 환율 · 원자재", why: whyOf("macro"),
     title: [tnx && `미 10년물 ${num(tnx.price, 3)}%`, ok(krw) && `원/달러 ${num(krw.price)}원`].filter(Boolean).join("\n"),
     rows: m.map(row),
     asof: `금리·달러 ${md(usDate)} 마감 · 그 외 ${fetchedMD} ${fetchedHM}` }, m.length < 4 ? "지표 부족" : null);
@@ -133,7 +143,7 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
 {
   const f = market.futures.filter(ok), a = market.asia.filter(ok);
   const es = f.find((x) => x.symbol === "ES=F"), nq = f.find((x) => x.symbol === "NQ=F");
-  add({ type: "groups", label: "지수선물 · 아시아",
+  add({ type: "groups", label: "지수선물 · 아시아", why: whyOf("futures"),
     title: es && nq ? `미국 선물 S&P ${pct(es.chg)}\n나스닥 ${pct(nq.chg)}` : "개장 전 선물과 아시아",
     groups: [
       { title: `미국 지수선물 · ${fetchedMD} ${fetchedHM}`, rows: f.map(row) },
@@ -155,7 +165,7 @@ newsCard("국내 경제뉴스", "국내 시장을\n움직인 뉴스", inbox.dome
     { name: "외국인", value: r.foreign, text: eok(r.foreign) },
     { name: "기관", value: r.institution, text: eok(r.institution) },
   ] });
-  add({ type: "flows", label: "국내 증시 · 투자자별 순매수",
+  add({ type: "flows", label: "국내 증시 · 투자자별 순매수", why: whyOf("kr"),
     title: `${streak}\n${krLine}`,
     rows: [
       { name: "코스피", sub: "KOSPI", value: num(kospi.close), chg: kospi.chg },
@@ -212,6 +222,11 @@ const caption = [
   `• 코스피(${md(kospi.date)}): ${num(kospi.close)} ${sign(kospi.chg)}${Math.abs(kospi.chg).toFixed(2)}%, 외국인 ${eok(kospi.foreign)}원`,
   ok(krw) ? `• 원/달러: ${num(krw.price)}원 (${fetchedMD} ${fetchedHM})` : null,
   "",
+  ...(() => { // 주요 뉴스 (카드에 실린 뉴스 제목, 해외 2·국내 2)
+    const pick = (label) => (cards.find((c) => c.type === "news" && c.label === label)?.items || []).slice(0, 2).map((n) => `• ${n.h}`);
+    const lines = [...pick("해외 경제뉴스"), ...pick("국내 경제뉴스")];
+    return lines.length ? ["주요 뉴스", ...lines, ""] : [];
+  })(),
   "카드에서 뉴스·업종 흐름·수급·오늘 일정을 확인하세요.",
   "저장해 두면 장 시작 전에 다시 보기 편합니다. 매일 아침 받아 보려면 팔로우해 주세요.",
   "",
