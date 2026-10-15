@@ -6,7 +6,7 @@
 //   배경을 안 주면 assets/bg/ 에서 그날 시장 방향(data.mood)에 맞는 것을 고르고, 없으면 기존 make_reel.mjs 로 넘긴다.
 
 import { chromium } from "playwright";
-import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, readdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, readdirSync, copyFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
@@ -150,14 +150,16 @@ for (let i = 1; i < segs.length; i++) {
 const hasAudio = execFileSync(FFPROBE, ["-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", bg]).toString().trim() !== "";
 const audioIn = hasAudio ? ["-stream_loop", "-1", "-i", bg] : ["-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=44100"];
 const ai = segs.length;
+// 다 만든 뒤에만 posts/<ID>_R 로 옮긴다 — 중간에 실패해도 기본 릴스가 그대로 남도록
 const R = join(ROOT, "posts", `${id}_R`);
-mkdirSync(R, { recursive: true });
+const OUT = join(work, "out");
+mkdirSync(OUT, { recursive: true });
 ff([...segs.flatMap((s) => ["-i", s]), ...audioIn, "-filter_complex",
   chain + `[${ai}:a]atrim=0:${total.toFixed(3)},asetpts=PTS-STARTPTS,volume=0.8,afade=t=in:d=0.3,afade=t=out:st=${(total - 1).toFixed(3)}:d=1,aresample=44100[a]`,
   "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-profile:v", "high", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p",
-  "-c:a", "aac", "-b:a", "128k", "-ac", "2", "-movflags", "+faststart", "-t", total.toFixed(3), join(R, "video.mp4")]);
+  "-c:a", "aac", "-b:a", "128k", "-ac", "2", "-movflags", "+faststart", "-t", total.toFixed(3), join(OUT, "video.mp4")]);
 // 커버: 훅 장면 1초 지점
-ff(["-ss", "1.0", "-i", join(work, "s0.mp4"), "-frames:v", "1", "-q:v", "3", join(R, "cover.jpg")]);
+ff(["-ss", "1.0", "-i", join(work, "s0.mp4"), "-frames:v", "1", "-q:v", "3", join(OUT, "cover.jpg")]);
 
 const caption = [
   `${+m}월 ${+d}일(${WD}) ${data.mode === "pm" ? "장 마감" : "개장 전"} 시장, ${Math.round(total)}초 정리`,
@@ -171,5 +173,7 @@ const caption = [
   "",
   "#마켓바이탈 #아침시황 #미국증시 #코스피 #경제뉴스",
 ].join("\n");
+mkdirSync(R, { recursive: true });
+for (const f of ["video.mp4", "cover.jpg"]) copyFileSync(join(OUT, f), join(R, f));
 writeFileSync(join(R, "post.json"), JSON.stringify({ id: `${id}_R`, format: "R", caption, first_comment: "", video: "video.mp4", cover: "cover.jpg", share_to_feed: false }, null, 2));
 console.log(`후킹형 릴스 ${segs.length}장면 ${total.toFixed(1)}초 (배경: ${bg.split(/[\\/]/).pop()}, 배경음 ${hasAudio ? "있음" : "없음"}) → posts/${id}_R/`);
