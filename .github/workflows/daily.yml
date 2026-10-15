@@ -89,6 +89,11 @@ jobs:
         continue-on-error: true
         run: node scripts/make_reel.mjs "${{ steps.build.outputs.folder }}"
 
+      - name: 후킹형 릴스로 바꾸기 (배경 영상 + 훅 문구, 실패하면 위 기본 릴스 그대로)
+        if: steps.reel.outcome == 'success'
+        continue-on-error: true
+        run: node scripts/make_reel_v2.mjs "${{ steps.build.outputs.folder }}"
+
       - name: 카드 이미지 보관 (Actions 화면에서 내려받아 확인)
         uses: actions/upload-artifact@v4
         with:
