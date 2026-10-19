@@ -1,0 +1,154 @@
+# 뉴스 후보 2026-10-20 (기간: 10/19 15:30 ~ 10/20 07:04 KST, 151건, 언론사 8곳)
+# 형식: 시각 | 언론사 | 제목 | 링크. 같은 사실이 두 언론사 이상에 있을 때만 뉴스로 쓴다.
+# 수집 실패: 서울경제 https://www.sedaily.com/rss/economy (HTTP 403) / 머니투데이 https://rss.mt.co.kr/mt_news.xml (fetch failed)
+10/20 07:03 | 파이낸셜뉴스 | 중앙일보 경영권 매각 우선협상대상에 다우·CJ 컨소시엄 낙점 [fn마켓워치] | https://www.fnnews.com/news/202610200658549692
+10/20 07:00 | 파이낸셜뉴스 | 전쟁·동맹부터 반도체까지…대한민국의 생존 전략을 묻다 [새책] | https://www.fnnews.com/news/202610200439514040
+10/20 06:54 | 연합뉴스 | AI·반도체주 반등…필리 지수 9거래일만에 반등 | https://www.yna.co.kr/view/AKR20261020010800009
+10/20 06:50 | 파이낸셜뉴스 | 美 트럼프, 다음달 미중러 정상회담 "中이 원하면 할 것" | https://www.fnnews.com/news/202610200643053834
+10/20 06:45 | 파이낸셜뉴스 | "구성환 번지점프에 무슨 일이"…'나혼산' 결국 고용노동부에 민원 접수 | https://www.fnnews.com/news/202610200635047216
+10/20 06:45 | 연합뉴스 | 美단체 "트럼프 알래스카 유세 동행 상무장관, 정치활동금지 위반" | https://www.yna.co.kr/view/AKR20261020008300071
+10/20 06:40 | 연합뉴스 | 뉴욕증시, 반도체·AI주 반등 속 혼조…나스닥 1.11%↑(종합) | https://www.yna.co.kr/view/AKR20261020006051072
+10/20 06:38 | 연합뉴스 | 트럼프 "마크롱에 '파리가 곧 무슬림도시 될 것' 경고했었다" | https://www.yna.co.kr/view/AKR20261020008900071
+10/20 06:31 | 파이낸셜뉴스 | 美 트럼프, 우크라 젤렌스키 교체 재압박 "러시아는 괜찮아" | https://www.fnnews.com/news/202610200626592898
+10/20 06:26 | 연합뉴스 | 트럼프, '젤렌스키 배제' 종전협상론…"푸틴·시진핑과 회담 용의" | https://www.yna.co.kr/view/AKR20261020006900071
+10/20 06:22 | 한국경제 | "잘나가면 1년에 10억도 우습다"…유튜버 수입 뜯어봤더니 | https://www.hankyung.com/article/2026102019227
+10/20 06:07 | 한국경제 | [속보] 트럼프, 내달 中서 김정은과 회담 여부에 "모르겠다" | https://www.hankyung.com/article/2026102019147
+10/20 06:05 | 연합뉴스 | [코스피·코스닥 전 거래일(19일) 주요공시] | https://www.yna.co.kr/view/AKR20261019170000008
+10/20 06:03 | 파이낸셜뉴스 | 트럼프, 11월 북미 정상회의 가능성에 "모르겠다" | https://www.fnnews.com/news/202610200548104109
+10/20 06:00 | 한국경제 | 소부장 늘렸더니...하이닉스 25% 빠질 때 -9% '선방'한 반도체 ETF | https://www.hankyung.com/article/202610190958i
+10/20 06:00 | 조선일보 | [금통위폴] 전문가 전원 “한은, 10월 금리 동결 예상… 11월 인상 유력” | https://www.chosun.com/economy/economy_general/2026/10/20/GVTDQNJVGA4TGZTFGNSDCODBGE/
+10/20 06:00 | 조선일보 | [비즈톡톡] 삼성·SK 향한 美 빅테크의 메모리 가격 인하 압력, 중국산 카드로 통할까 | https://www.chosun.com/economy/tech_it/2026/10/20/HBTDGOBQGQZDANZUGAZGENJTGU/
+10/20 06:00 | 조선일보 | 삼성-SK도 받은 관세평가분류원 ‘우량 수출기업 인증’... “中企 비용 부담 줄일 것” | https://www.chosun.com/economy/economy_general/2026/10/20/GY3TCZBRHEYWGZLCMM2TMZRZMQ/
+10/20 06:00 | 조선일보 | 중국차, 글로벌 BEV·PHEV 톱20 중 17개 휩쓸어… ‘보급형 모델’ 없는 현대차 고전 | https://www.chosun.com/economy/industry-company/2026/10/20/GEYDIYJTMY3DEYRVHA4TOMLDG4/
+10/20 05:51 | 연합뉴스 | "유튜버 법인 상위 10%가 신고 수입 76% 차지…집중 더 심화" | https://www.yna.co.kr/view/AKR20261019161100002
+10/20 05:50 | 동아일보 | 뉴욕증시, AI 기술주 매수 흐름에 혼조 마감…나스닥 1.1% 상승 | https://www.donga.com/news/Inter/article/all/20261020/134871469/1
+10/20 05:48 | 파이낸셜뉴스 | [국제유가] 혼조세 마감…러 제재 완화 속 우크라 공격 재개, 후티 반군 공세 | https://www.fnnews.com/news/202610200454429331
+10/20 05:47 | 조선일보 | 반도체 반등에 나스닥 1.11%↑…AI 부채 우려는 여전 | https://www.chosun.com/economy/int_economy/2026/10/20/3R47EXNP2BDMZI3CXQT54LFP6U/
+10/20 05:30 | 조선일보 | “일시적 고금리? 꿈도 꾸지 마라, 장기 고금리 시대 도래할 것” | https://www.chosun.com/economy/money/2026/10/20/TUG6S45UEVF43KQSHMEXEGWCRY/
+10/20 05:28 | 파이낸셜뉴스 | [뉴욕증시] AI 저가 매수에 기술주 반등…테슬라, 3.8% 급등 | https://www.fnnews.com/news/202610200525558534
+10/20 05:27 | 연합뉴스 | 뉴욕증시, 반도체·AI주 반등 속 혼조…나스닥 1.11%↑ | https://www.yna.co.kr/view/AKR20261020006000072
+10/20 05:20 | 연합뉴스 | 트럼프, '교체설' 백악관 비서실장에 "엄청난 투사" 찬사 | https://www.yna.co.kr/view/AKR20261020005600071
+10/20 05:20 | 조선일보 | 발볼 넓은 한국인에 딱 맞춰 신발 만들었는데, 일본 등 수출로 대박 | https://www.chosun.com/economy/startup_story/2026/08/31/JZORE2UCFBDW5MDL4ZQ6NBIHMI/
+10/20 05:08 | 연합뉴스 | 국제유가, 러시아 제재 완화·후티 반군 석유시설 공격에 혼조 | https://www.yna.co.kr/view/AKR20261020005500072
+10/20 05:05 | 연합뉴스 | 트럼프, 내달 中서 김정은과 회담 여부에 "모르겠다" | https://www.yna.co.kr/view/AKR20261020005300071
+10/20 05:02 | 파이낸셜뉴스 | [속보][뉴욕증시] AI 저가 매수에 나스닥 반등…다우지수는 약보합 | https://www.fnnews.com/news/202610200501333691
+10/20 05:00 | 이투데이 | [단독] 감사원, 5대 정책금융기관 녹색금융 실태 점검…790조 기후금융 검증 본격화 | https://www.etoday.co.kr/news/view/2637242
+10/20 05:00 | 이투데이 | 수익 나누고 결제망 넓히고⋯국내 기업으로 번진 달러 스테이블코인 경쟁 | https://www.etoday.co.kr/news/view/2637424
+10/20 04:38 | 연합뉴스 | [속보] 트럼프, 내달 中서 김정은과 회담 여부에 "모르겠다" | https://www.yna.co.kr/view/AKR20261020005100071
+10/20 04:38 | 한국경제 | "특수·일반 교사 훈련과 협력이 핵심"… 뉴욕이 증명한 자폐 통합교육의 조건 | https://www.hankyung.com/article/202610201852i
+10/20 04:30 | 파이낸셜뉴스 | 이다해, 만삭의 몸으로 중국서 '200억 완판'…단 2시간 만에 터진 대박 | https://www.fnnews.com/news/202610191602525335
+10/20 04:30 | 동아일보 | 李 “지배경영권 남용 등에 증시 저평가” 기업에 화살 | https://www.donga.com/news/Economy/article/all/20261020/134871090/2
+10/20 04:30 | 동아일보 | [단독]중동전쟁에 수출 차질, 기아 화성1공장 5일간 1000대 감산 | https://www.donga.com/news/Economy/article/all/20261020/134871084/2
+10/20 04:30 | 동아일보 | 중앙일보 경영권 매각 우선협상대상에 다우-CJ컨소시엄 | https://www.donga.com/news/Economy/article/all/20261020/134871160/2
+10/20 04:30 | 동아일보 | 사천에어쇼, K방산 수출 전시장 변신 | https://www.donga.com/news/Society/article/all/20261019/134869659/2
+10/20 04:30 | 동아일보 | 中 3분기 성장률, 수출 호조에 4.5%로 반등 | https://www.donga.com/news/Inter/article/all/20261019/134870692/2
+10/20 04:02 | 연합뉴스 | "트럼프의 지지 선언, 네타냐후 지지율에 별 영향 없어" | https://www.yna.co.kr/view/AKR20261020004300079
+10/20 03:42 | 한국경제 | 아마존 목표가 350달러…엔비디아도 비중확대 유지 [월가 업&다운] | https://www.hankyung.com/article/202610201850i
+10/20 03:28 | 헤럴드경제 | 서울 비빔밥 가격 역대 최고가 기록…김치찌개는 이러다 9000원 되겠네 [부동산360] | https://biz.heraldcorp.com/article/10907730
+10/20 02:45 | 연합뉴스 | 네타냐후, 총선 지지 트럼프와 통화…이란 언급하며 "할일 남아" | https://www.yna.co.kr/view/AKR20261020003100079
+10/20 01:47 | 연합뉴스 | 美 주택건설업 체감경기 14년여만에 최저…고금리·건설비 부담 | https://www.yna.co.kr/view/AKR20261020002100072
+10/20 01:45 | 연합뉴스 | 트럼프·공화당, 중간선거 패색 먹구름에 벌써 '네탓' 내홍 | https://www.yna.co.kr/view/AKR20261020001700071
+10/20 01:25 | 동아일보 | 김경엽 롯데이노베이트 대표, “고도화 지능교통체계 글로벌 수출 모색”…기대감↑ | https://www.donga.com/news/Economy/article/all/20261020/134871373/1
+10/20 01:08 | 파이낸셜뉴스 | 트럼프 행정부, 美 연방기관서 中 AI '딥시크' 전면 퇴출 | https://www.fnnews.com/news/202610200106359940
+10/20 00:53 | 조선일보 | 높아지는 무역 장벽에… 기업들도 “CPTPP 필요성 커져” | https://www.chosun.com/economy/industry-company/2026/10/20/LDDCTRVPARBWBIGVFX4IBXXHYQ/
+10/20 00:50 | 조선일보 | ‘유럽의 병자’ 된 프랑스, 청년세대의 희망 도려내 기성세대 줬다 | https://www.chosun.com/economy/stock-finance/2026/10/20/K3RX7UXNXBAQNDC5OCUQSFVP5Y/
+10/20 00:36 | 조선일보 | [주식 매매 상위 종목 및 환율] 2026년 10월 19일자 | https://www.chosun.com/economy/stock-finance/2026/10/20/Z5QR7J3G4ZDE3NVLBUL3MVKOFU/
+10/20 00:36 | 조선일보 | 해외 부동산 공모펀드 수익률 수년째 부진 | https://www.chosun.com/economy/stock-finance/2026/10/20/LE6IML5BJZHIDCJEK337GA22FA/
+10/20 00:36 | 조선일보 | 외국인, 최근 13거래일 동안 26조원 순매도 | https://www.chosun.com/economy/stock-finance/2026/10/20/FDLJQAB62BAKPPJHS76PNXSNGU/
+10/20 00:35 | 연합뉴스 | 민주당 의회 장악 대비?…트럼프 참모들 변호사 선임 경쟁 | https://www.yna.co.kr/view/AKR20261020000600072
+10/20 00:33 | 조선일보 | 발전 공기업 수입한 석탄 70%, 국내서 검사해보니 ‘열량 미달’ | https://www.chosun.com/economy/industry-company/2026/10/20/PGGTHBTH4JH77PCISG5OWGVT64/
+10/20 00:32 | 헤럴드경제 | 박찬대 “지방재정 악화 문제, 제11회 중앙지방협력회의 안건으로 추진” | https://biz.heraldcorp.com/article/10907460
+10/20 00:32 | 조선일보 | “韓반도체, 안보 카드 되려면 日소부장 잡아야” | https://www.chosun.com/economy/economy_general/2026/10/20/75DVK5QVXJDYLIODV5FPGWDDZA/
+10/20 00:31 | 조선일보 | 판매량 40% 급증… 전기차 부활, 유럽선 시작됐다 | https://www.chosun.com/economy/auto/2026/10/20/YHGVJFBNUZABJGSE7JY3L2BYME/
+10/20 00:30 | 동아일보 | 횡성한우 카타르 간다… 이슬람권 3번째 수출 | https://www.donga.com/news/Economy/article/all/20261019/134869941/2
+10/20 00:30 | 동아일보 | 이형일 “올해 성장률 3.4~3.6% 가능” | https://www.donga.com/news/Economy/article/all/20261019/134869905/2
+10/20 00:30 | 동아일보 | ‘국부펀드’ 한투공, 중국산 AI 모델로 핵심업무 처리 | https://www.donga.com/news/Economy/article/all/20261019/134869903/2
+10/20 00:30 | 동아일보 | 현대차그룹, 로템으로 방산 일원화… 위아는 모빌리티에 집중 | https://www.donga.com/news/Economy/article/all/20261019/134869956/2
+10/20 00:30 | 동아일보 | “반도체 협력사 2조원 보증”… 정부-SK하이닉스 금융지원 | https://www.donga.com/news/Economy/article/all/20261019/134869947/2
+10/20 00:30 | 동아일보 | 코스피, 1.8% 상승 마감 | https://www.donga.com/news/Economy/article/all/20261019/134869955/2
+10/20 00:30 | 동아일보 | [애널리스트의 마켓뷰]유류비 상승에도 ‘K뷰티’ 수출 기대 | https://www.donga.com/news/Economy/article/all/20261019/134869062/2
+10/20 00:30 | 동아일보 | [단신]삼성운용, ‘KODEX 미국배당다우존스액티브’ 상장 外 | https://www.donga.com/news/Economy/article/all/20261019/134869047/2
+10/20 00:28 | 연합뉴스 | 트럼프 행정부, 연방기관 시스템서 中 '딥시크' AI 모델 퇴출 | https://www.yna.co.kr/view/AKR20261020000500071
+10/19 23:42 | 매일경제 | '다우키움·CJ 컨소시엄' 중앙일보 품는다 | https://www.mk.co.kr/news/stock/12180105
+10/19 23:16 | 동아일보 | 중앙일보 경영권 매각 우선협상대상에 다우·CJ 컨소시엄 | https://www.donga.com/news/Economy/article/all/20261019/134871124/1
+10/19 23:13 | 연합뉴스 | 트럼프, '유세 만원관중' 또 홍보…우파 폭스에 'PC주의' 딱지 | https://www.yna.co.kr/view/AKR20261019180400071
+10/19 23:13 | 한국경제 | 美 증시, AI 관련 주식 저가 매수에 나스닥 반등 | https://www.hankyung.com/article/202610191800i
+10/19 23:01 | 연합뉴스 | 뉴욕증시, 기술주 저가 매수에 혼조 출발 | https://www.yna.co.kr/view/AKR20261019180800009
+10/19 22:54 | 헤럴드경제 | 중앙일보 인수 우선협상대상자에 다우키움·CJ…워크아웃 3개월만 | https://biz.heraldcorp.com/article/10907837
+10/19 22:51 | 매일경제 | JP모건, 맞으면 좋고 틀리면 말고…1만5천피 외치더니 “코스피 바닥 몰라” | https://www.mk.co.kr/news/stock/12180088
+10/19 22:48 | 조선일보 | 중앙일보 M&A 우선협상대상자에 ‘다우·CJ 컨소시엄’ | https://www.chosun.com/economy/stock-finance/2026/10/19/47JYD55ZGBEKTHUPLJ4FG4XGJA/
+10/19 22:33 | 헤럴드경제 | 관세청, 9월의 ‘마약단속왕’ 시상 | https://biz.heraldcorp.com/article/10907194
+10/19 22:24 | 조선일보 | ‘막차’ 탄 3대 주주가 판 뒤집었다… 중앙일보 우협에 다우·CJ 컨소 | https://www.chosun.com/economy/stock-finance/2026/10/19/GYZWKNLGGVSDMNJQMNRDIZJWGE/
+10/19 22:00 | 한국경제 | "삼전닉스 실적 과거일 뿐"…'코스피 4800선 추락' 경고 [분석+] | https://www.hankyung.com/article/2026101910246
+10/19 21:51 | 파이낸셜뉴스 | "2차 피해만 보상?" 국회 질타에 신한은행장 "과실 여부 떠나 전액 보상 계획" | https://www.fnnews.com/news/202610191805173207
+10/19 21:18 | 연합뉴스 | 프랑스 폭동, 이민의 대가?…유럽서 이주민 논쟁 다시 불붙었다 | https://www.yna.co.kr/view/AKR20261019176200085
+10/19 20:46 | 연합뉴스 | 다카이치, 감세 재원 국채 발행 언급…"엔화 신뢰 높일 것"(종합) | https://www.yna.co.kr/view/AKR20261019113851073
+10/19 20:27 | 헤럴드경제 | 기숙사 기준 어겨도 외국인력 배정…감점제 ‘유명무실’ | https://biz.heraldcorp.com/article/10907076
+10/19 20:26 | 헤럴드경제 | 앰코테크놀로지, 광주에 3조 투자 “서남권 반도체 프로젝트 신호탄” | https://biz.heraldcorp.com/article/10907071
+10/19 20:25 | 헤럴드경제 | “올해 3.6% 가능…잠재성장률 반등 임박” | https://biz.heraldcorp.com/article/10907068
+10/19 20:21 | 헤럴드경제 | 이형일 “필요시 증시 안정조치 준비”…증안펀드·공매도 중단 가능성 열어둬 | https://biz.heraldcorp.com/article/10907041
+10/19 20:15 | 헤럴드경제 | 대전TP, 북미 미래차·배터리 산업 무역사절단 운영 | https://biz.heraldcorp.com/article/10907013
+10/19 20:00 | 헤럴드경제 | 40조 달러짜리 로봇이 딸기 하나를 못 딴다 [조원경의 현인들의 경제적 조언] | https://biz.heraldcorp.com/article/10906959
+10/19 19:40 | 연합뉴스 | 中, 분쟁국에 터널굴착기·장비 수출 제한…드론 통제도 조정(종합) | https://www.yna.co.kr/view/AKR20261019151151083
+10/19 19:26 | 한국경제 | 빅테크에 반도체 기판…삼성전기 3600억 수주 | https://www.hankyung.com/article/2026101916931
+10/19 19:06 | 파이낸셜뉴스 | 市, 산업·민생경제 이끌 공공기관 새 수장 임명 | https://www.fnnews.com/news/202610191906204640
+10/19 19:02 | 한국경제 | 中, 대출금리 결정체계 대수술…기업이 기준금리 직접 고른다 [차이나 워치] | https://www.hankyung.com/article/202610191663i
+10/19 19:00 | 헤럴드경제 | 이형일 “올해 성장률 3.6%도 가능…잠재성장률 반등 임박” | https://biz.heraldcorp.com/article/10906563
+10/19 19:00 | 헤럴드경제 | 이형일 “조정지역 매입임대 LH에 팔면 양도세 감면…필요시 증시 안정조치” | https://biz.heraldcorp.com/article/10906560
+10/19 18:56 | 매일경제 | 코스피 반등 모멘텀 찾을까…금통위·테슬라 실적이 시험대 [동여의도 위클리] | https://www.mk.co.kr/news/stock/12179944
+10/19 18:18 | 한국경제 | [단독] DMS "반도체 유리기판 장비 시장 진출" | https://www.hankyung.com/article/2026101914741
+10/19 18:17 | 한국경제 | "올 성장률 3.4∼3.6%…잠재성장률 반등 임박" | https://www.hankyung.com/article/2026101915061
+10/19 18:12 | 한국경제 | '수출 호조' 中, 3분기 4.5% 성장…소비·부동산 침체는 여전 | https://www.hankyung.com/article/2026101914591
+10/19 18:11 | 한국경제 | 유럽마저 온통 붉은색…"中에 기술·인재 다 뺏겼다" | https://www.hankyung.com/article/2026101914561
+10/19 18:03 | 헤럴드경제 | [단독]기숙사 부적합 사업장도 외국인력 98% 배정…감점제 유명무실 | https://biz.heraldcorp.com/article/10906555
+10/19 18:01 | 한국경제 | [단독] 천보 "美·中에 차세대 배터리 전해액 수출" | https://www.hankyung.com/article/2026101914731
+10/19 17:58 | 한국경제 | '코어위브 신용 쇼크' 더 세게 맞은 코스피 | https://www.hankyung.com/article/2026101914781
+10/19 17:51 | 매일경제 | 실적 발표에는 널뛰는 주식…기준금리 변화 영향은 미미 한 까닭 [너드의 투자법] | https://www.mk.co.kr/news/economy/12179919
+10/19 17:51 | 헤럴드경제 | 앰코 광주공장 3조원 증축…서남권 반도체 프로젝트 신호탄 | https://biz.heraldcorp.com/article/10906537
+10/19 17:50 | 한국경제 | 삼성생명 퇴직연금 1위 재탈환…반년 만에 신한은행 제쳤다 | https://www.hankyung.com/article/2026101915201
+10/19 17:48 | 한국경제 | 시중금리 오르는데 저축銀 예금금리는 제자리 | https://www.hankyung.com/article/2026101915221
+10/19 17:45 | 조선일보 | MLCC·인덕터 이어 반도체 기판도… 삼성전기, 3605억원 규모 장기 공급계약 체결 | https://www.chosun.com/economy/tech_it/2026/10/19/ME4TEY3BMVQWEYZRMVQTCOJXGM/
+10/19 17:45 | 매일경제 | 뛰는 유가·정유마진에… 美에너지 ETF '훨훨' | https://www.mk.co.kr/news/stock/12179893
+10/19 17:45 | 매일경제 | JP모건 "코스피 매우 싸지만 … 바닥은 글쎄" | https://www.mk.co.kr/news/stock/12179891
+10/19 17:42 | 한국경제 | 경유 44% 급등·담배 한갑 2만원…프랑스 물가 비명 | https://www.hankyung.com/article/2026101914841
+10/19 17:40 | 매일경제 | 겁도 나고, 방패 든 개미들 … "경기방어株로 피신" | https://www.mk.co.kr/news/stock/12179881
+10/19 17:39 | 한국경제 | "中속도·유럽기술 더해 시너지 극대화" | https://www.hankyung.com/article/2026101914531
+10/19 17:38 | 연합뉴스 | [속보] 李대통령 "집값잡으려 세금 올린것 아냐…2028년 공급 정상화" | https://www.yna.co.kr/view/AKR20261019158800001
+10/19 17:38 | 연합뉴스 | 울산항 3분기 자동차 수출 14.4%↓…"하계휴가·생산 차질 영향" | https://www.yna.co.kr/view/AKR20261019158200057
+10/19 17:33 | 조선일보 | 李 “부동산 대출 규제, 구체적 타당성 결여된 사례 최소화” | https://www.chosun.com/economy/economy_general/2026/10/19/HEYTAM3FMRTGEZLEMNRDSODDME/
+10/19 17:31 | 조선일보 | 李 “증시 급락, 다 제자리 돌아갈 것... 시장 불안 해소 대책 마련” | https://www.chosun.com/economy/economy_general/2026/10/19/HE3DSMZWGU4TOMTCMNQTIZLBGM/
+10/19 17:22 | 연합뉴스 | 中, 분쟁국에 터널굴착기·장비 수출 제한…"이중용도 특성" | https://www.yna.co.kr/view/AKR20261019151100083
+10/19 17:21 | 연합뉴스 | 이스라엘 경찰, 美 언론인·유럽 외교관 폭행 정착민 10명 체포 | https://www.yna.co.kr/view/AKR20261019155100079
+10/19 17:08 | 한국경제 | 증시 주인공된 배터리주…미국 ESS 시장 中 업체 퇴출에 삼성SDI·LG엔솔 강세 | https://www.hankyung.com/article/202610191270i
+10/19 16:59 | 연합뉴스 | 국고채 금리, 금통위 앞두고 일제히 상승…3년물 연 3.877%(종합) | https://www.yna.co.kr/view/AKR20261019145251008
+10/19 16:45 | 한국경제 | 코스피 9% 빠질 때 조용히 올랐다…급락장 피난처 된 이 업종 | https://www.hankyung.com/article/202610191159i
+10/19 16:42 | 연합뉴스 | 국고채 금리 일제히 상승…3년물 연 3.877% | https://www.yna.co.kr/view/AKR20261019145200008
+10/19 16:40 | 연합뉴스 | 중앙일보 매각 본입찰에 다우키움·오리온 등 6곳 참여 | https://www.yna.co.kr/view/AKR20261019144500008
+10/19 16:39 | 한국경제 | '채찍효과'에 더 흔들리는 코스피…SOX 대비 '초과 수익' 반납 | https://www.hankyung.com/article/202610190090i
+10/19 16:32 | 연합뉴스 | 中 3분기 GDP 4.5% 늘어 전망치 웃돌아…올해 목표 달성 가시화(종합2보) | https://www.yna.co.kr/view/AKR20261019074352089
+10/19 16:31 | 연합뉴스 | [표] 코스피 지수선물·옵션 시세표(19일)-3 | https://www.yna.co.kr/view/AKR20261019143100008
+10/19 16:31 | 연합뉴스 | [표] 코스피 지수선물·옵션 시세표(19일)-2 | https://www.yna.co.kr/view/AKR20261019143000008
+10/19 16:31 | 연합뉴스 | [표] 코스피 지수선물·옵션 시세표(19일)-1 | https://www.yna.co.kr/view/AKR20261019143200008
+10/19 16:24 | 연합뉴스 | 원/달러 환율 2년만에 또 최저…위안화 환율도 1년만에 최저(종합) | https://www.yna.co.kr/view/AKR20261019137151002
+10/19 16:23 | 연합뉴스 | 코스피, 1.8% 오른 5,768…이틀 연속 상승하며 반등흐름 유지(종합) | https://www.yna.co.kr/view/AKR20261019137000008
+10/19 16:15 | 연합뉴스 | 한우, 카타르에 첫 정식 수출…할랄 시장 3번째 진출 | https://www.yna.co.kr/view/AKR20261019135700003
+10/19 16:11 | 연합뉴스 | 코스피, 저가매수에 반등 '선방'…반도체주 투심 여전히 '신중'(종합) | https://www.yna.co.kr/view/AKR20261019083551008
+10/19 16:07 | 한국경제 | "중국에 개인정보 다 넘어갈라"…日 결국 '특단의 조치' [도쿄나우] | https://www.hankyung.com/article/202610190964i
+10/19 16:07 | 연합뉴스 | 원/달러 환율 1,327.6원 또 연저점…위안화 환율도 1년만에 최저 | https://www.yna.co.kr/view/AKR20261019137100002
+10/19 16:07 | 연합뉴스 | 오세훈 "서울 집값 연말·내년 초까지 우상향 가능성 높아"(종합) | https://www.yna.co.kr/view/AKR20261019084951004
+10/19 15:57 | 매일경제 | ‘상승전환’ 코스피, 1.8% 오른 5768 마감…코스닥도 올라 | https://www.mk.co.kr/news/stock/12179680
+10/19 15:53 | 한국경제 | 교직원공제회, '반도체 소부장' 펀드 투자로 1100억 벌었다 | https://www.hankyung.com/article/2026101998781
+10/19 15:49 | 한국경제 | 삼성운용, 'KODEX 미국배당다우존스액티브' 20일 상장 | https://www.hankyung.com/article/202610191072i
+10/19 15:45 | 연합뉴스 | [표] 코스닥 외국인 순매수도 상위종목(19일) | https://www.yna.co.kr/view/AKR20261019134100008
+10/19 15:45 | 연합뉴스 | [표] 코스닥 기관 순매수도 상위종목(19일) | https://www.yna.co.kr/view/AKR20261019134000008
+10/19 15:45 | 연합뉴스 | [표] 거래소 외국인 순매수도 상위종목(19일) | https://www.yna.co.kr/view/AKR20261019133900008
+10/19 15:45 | 연합뉴스 | [표] 거래소 기관 순매수도 상위종목(19일) | https://www.yna.co.kr/view/AKR20261019133800008
+10/19 15:41 | 한국경제 | 코스피, 장 초반 급락 딛고 1.76% 상승…코스닥도 800선 회복 | https://www.hankyung.com/article/2026101910386
+10/19 15:41 | 한국경제 | 블룸버그 "하나증권, 달러 후순위채 가격 강세 이어질 것" | https://www.hankyung.com/article/2026101910406
+10/19 15:38 | 연합뉴스 | 대만, SNS에 '대만 주권 소멸' 주장 쓴 중국 교환학생 추방 | https://www.yna.co.kr/view/AKR20261019126500009
+10/19 15:37 | 한국경제 | [속보] 코스피, 1.8% 오른 5768 마감…코스닥도 1.8% 올라 | https://www.hankyung.com/article/2026101910326
+10/19 15:36 | 연합뉴스 | 코스피, 1.8% 오른 5,768 마감…코스닥도 1.8% 올라 | https://www.yna.co.kr/view/AKR20261019130800008
+10/19 15:33 | 연합뉴스 | [속보] 코스피, 1.8% 오른 5,768 마감…코스닥도 1.8% 올라 | https://www.yna.co.kr/view/AKR20261019130100008
+10/19 15:33 | 연합뉴스 | [코스닥] 14.11p(1.78%) 오른 808.89(장종료) | https://www.yna.co.kr/view/AKR20261019130000008
+10/19 15:33 | 연합뉴스 | [코스피] 99.96p(1.76%) 오른 5,768.01(장종료) | https://www.yna.co.kr/view/AKR20261019129900008
+10/19 15:30 | 연합뉴스 | [외환] 원/달러 환율 1.1원 내린 1,330.3원(15:30 기준가) | https://www.yna.co.kr/view/AKR20261019129000002
