@@ -12,6 +12,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { seriesNo, lifeLine, hashtags, firstComment as engageComment, amReel } from "./engage.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const kst = (d = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
@@ -214,13 +215,21 @@ cards.push({ type: "outro", label: "마켓바이탈",
   rules: ["종목 추천을 하지 않습니다", "모든 수치는 표기된 시점 기준입니다", "투자 판단과 책임은 본인에게 있습니다"] });
 
 // ── 캡션 ──────────────────────────────────────────────────────────────
+const NO = seriesNo(ROOT, DATE, false);
+const life = lifeLine(krw);
+const newsText = cards.filter((c) => c.type === "news").flatMap((c) => c.items.map((n) => n.h)).join(" ");
+const mac = (sym) => market.macro.find((x) => x.symbol === sym);
+const TAGS = hashtags({ pm: false, ndx, kospi, krw, sox, tnx: mac("^TNX"), oil: mac("CL=F"), gold: mac("GC=F"), streak: kospi.foreignStreak, newsText });
+const sched = cards.find((c) => c.type === "schedule" && !c.title.startsWith("이번 주"));
+const event = sched?.items?.[0] ? `${sched.items[0].time} ${sched.items[0].region} ${sched.items[0].item}` : null;
 const sign = (v) => (v > 0 ? "▲" : v < 0 ? "▼" : "");
 const caption = [
-  `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일(${wd(DATE)}) 개장 전 시장 요약`,
+  `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일(${wd(DATE)}) 개장 전 시장 요약 · 바이탈 체크 ${NO}일째`,
   "",
   `• 미국(${md(usDate)} 마감): S&P 500 ${sign(spx.chg)}${Math.abs(spx.chg).toFixed(2)}%, 나스닥 ${sign(ndx.chg)}${Math.abs(ndx.chg).toFixed(2)}%`,
   `• 코스피(${md(kospi.date)}): ${num(kospi.close)} ${sign(kospi.chg)}${Math.abs(kospi.chg).toFixed(2)}%, 외국인 ${eok(kospi.foreign)}원`,
   ok(krw) ? `• 원/달러: ${num(krw.price)}원 (${fetchedMD} ${fetchedHM})` : null,
+  life ? `• 생활 체감: ${life}` : null,
   "",
   ...(() => { // 주요 뉴스 (카드에 실린 뉴스 제목, 해외 2·국내 2)
     const pick = (label) => (cards.find((c) => c.type === "news" && c.label === label)?.items || []).slice(0, 2).map((n) => `• ${n.h}`);
@@ -234,19 +243,12 @@ const caption = [
   "운영자는 카드에 언급된 종목을 보유하고 있을 수 있습니다.",
   "자료: Yahoo Finance, 다음 금융(수치), 각 언론 보도(뉴스 요약)",
   "",
-  // 인스타는 관련도 높은 해시태그 3~5개를 권장한다
-  "#마켓바이탈 #미국증시 #코스피 #환율 #경제뉴스",
+  // 인스타는 관련도 높은 해시태그 3~5개를 권장한다 — 고정 2개 + 그날 이슈 3개
+  TAGS,
 ].filter((x) => x !== null).join("\n");
 
-// 첫 댓글: 요일마다 다른 질문으로 댓글 참여를 유도한다 (예측·종목 추천을 묻지 않는 중립 질문)
-const QUESTIONS = [
-  "오늘 카드에서 가장 눈에 띈 지표는 무엇인가요? 댓글로 알려 주세요.",
-  "매일 아침 카드에 더 보고 싶은 지표가 있나요? 댓글로 남겨 주시면 반영해 보겠습니다.",
-  "출근길에 가장 먼저 확인하는 숫자는 무엇인가요? 환율, 금리, 지수 중에서 골라 주세요.",
-  "이번 주 가장 궁금한 경제 일정은 무엇인가요? 댓글로 알려 주세요.",
-  "이번 주 시장에서 가장 크게 느껴진 변화는 무엇이었나요? 댓글로 나눠 주세요.",
-];
-const firstComment = QUESTIONS[(new Date(DATE + "T12:00:00+09:00").getUTCDay() + 6) % 7 % QUESTIONS.length];
+// 첫 댓글: 요일마다 다른 참여형 질문 (매수·매도·전망은 묻지 않음)
+const firstComment = engageComment(DATE, false);
 
 // ── 검사: 차단 목록(보유 종목) ─────────────────────────────────────────
 const block = (process.env.BLOCKLIST || "").split(/[,\n]/).map((s) => s.trim()).filter((s) => s.length >= 2);
@@ -258,7 +260,10 @@ if (hits) fail(`차단 목록 단어가 ${hits}개 발견되었습니다. 발행
 // ── 출력 ──────────────────────────────────────────────────────────────
 const total = cards.length;
 cards.forEach((c, i) => { c.page = `${i + 1} / ${total}`; });
-const data = { id: ID, date: DATE, dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일`, handle: "@market.vitals", cards };
+const data = { id: ID, date: DATE, dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일`, handle: "@market.vitals", cards,
+  // 릴스 문구 (make_reel_v2.mjs 가 쓴다)
+  reel: { ...amReel({ spx, ndx, dji, kospi, krw, tnx: mac("^TNX"), newsHead: cards.find((c) => c.type === "news" && c.label === "해외 경제뉴스")?.items?.[0]?.h, event, life, no: NO }),
+    tags: TAGS, comment: firstComment, mood: [spx, ndx, dji].reduce((t, x) => t + (x.chg || 0), 0) >= 0 ? "up" : "down" } };
 const altOf = (c, i) => `${i + 1}/${total}장. ${c.label}. ${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}`;
 const post = {
   id: ID, caption, first_comment: firstComment,

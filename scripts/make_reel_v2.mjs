@@ -28,7 +28,7 @@ function pickBg() {
   // 시장 방향: data.mood 가 없으면 미국 3대 지수 평균 등락으로 정한다 (0 이상 up, 아니면 down)
   const us = (data.cards.find((c) => c.label === "미국 증시")?.rows || []).slice(0, 3).filter((r) => r.chg != null);
   const avg = us.length ? us.reduce((t, r) => t + r.chg, 0) / us.length : 0;
-  const want = data.mood || (data.mode === "pm" ? "neutral" : avg >= 0 ? "up" : "down");
+  const want = data.reel?.mood || data.mood || (data.mode === "pm" ? "neutral" : avg >= 0 ? "up" : "down");
   const day = Number(data.date.replaceAll("-", ""));
   const pool = files.filter((f) => f.startsWith(want));
   const neutral = files.filter((f) => f.startsWith("neutral"));
@@ -38,8 +38,11 @@ function pickBg() {
 const bg = pickBg();
 if (!bg || !existsSync(bg)) { console.error("배경 영상 없음 — 기존 릴스 방식으로 만드세요(make_reel.mjs)."); process.exit(3); }
 
-// 릴스에 넣을 카드 (아침 기준, 있는 것만)
-const ORDER = [["news:해외 경제뉴스", 2.4], ["rows:미국 증시", 2.2], ["rows:금리 · 환율 · 원자재", 2.2], ["flows", 2.4], ["schedule", 2.0]];
+// 릴스에 넣을 카드 (있는 것만)
+const PM = data.mode === "pm";
+const ORDER = PM
+  ? [["flows", 2.4], ["groups:환율 · 아시아 마감", 2.2], ["news:국내 경제뉴스", 2.4], ["rows:미국 지수선물 · 오늘 밤", 2.2], ["schedule", 2.0]]
+  : [["news:해외 경제뉴스", 2.4], ["rows:미국 증시", 2.2], ["rows:금리 · 환율 · 원자재", 2.2], ["flows", 2.4], ["schedule", 2.0]];
 const picks = [];
 for (const [key, sec] of ORDER) {
   const [type, label] = key.split(":");
@@ -61,7 +64,11 @@ function hookLines() {
   const l2 = head && head.length <= 16 ? head : cover[1] || "";
   return [l1, l2].filter(Boolean);
 }
-const hook = hookLines();
+const R0 = data.reel; // build.mjs·build_pm.mjs 가 engage.mjs 로 만든 문구
+const hook = R0?.hook || hookLines();
+const kicker = R0?.kicker || "";
+const bottom = R0?.bottom || "숫자로 15초 정리 ↓";
+const esc = (t) => String(t).replace(/[<>&]/g, "");
 
 const work = join(ROOT, "work", `reel2-${id}`);
 rmSync(work, { recursive: true, force: true });
@@ -74,12 +81,13 @@ const hookHTML = `<!doctype html><meta charset="utf-8">${FONT}<style>${BASE}
 .top{position:absolute;left:80px;top:150px;color:#7ff0bf;font-size:46px;font-weight:900;letter-spacing:-.02em}
 .top span{display:block;color:#fff;opacity:.85;font-size:38px;font-weight:700;margin-top:10px}
 .mid{position:absolute;left:70px;right:70px;top:640px;display:flex;flex-direction:column;gap:22px}
+.mid p{margin:0 0 -4px 6px;color:#fff;font-size:50px;font-weight:900;letter-spacing:-.03em;text-shadow:0 2px 16px rgba(0,0,0,.7)}
 .mid div{display:inline-block;align-self:flex-start;background:rgba(10,30,24,.78);color:#fff;font-size:84px;font-weight:900;line-height:1.12;letter-spacing:-.05em;padding:14px 26px;border-radius:18px}
-.mid div:first-child{color:#7ff0bf}
+.mid div:first-of-type{color:#7ff0bf}
 .bot{position:absolute;left:0;right:0;bottom:330px;text-align:center;color:#fff;font-size:44px;font-weight:900;text-shadow:0 2px 16px rgba(0,0,0,.6)}
 </style><div class="f"><div class="top">마켓바이탈<span>${when} 시장 정리</span></div>
-<div class="mid">${hook.map((l) => `<div>${l.replace(/[<>&]/g, "")}</div>`).join("")}</div>
-<div class="bot">숫자로 15초 정리 ↓</div></div>`;
+<div class="mid">${kicker ? `<p>${esc(kicker)}</p>` : ""}${hook.map((l) => `<div style="font-size:${l.length > 17 ? 62 : l.length > 14 ? 72 : 84}px">${esc(l)}</div>`).join("")}</div>
+<div class="bot">${esc(bottom)}</div></div>`;
 // 2) 카드 장면: 어두운 배경 + 카드 (확대 효과는 ffmpeg)
 const cardHTML = (img, i, n) => `<!doctype html><meta charset="utf-8">${FONT}<style>${BASE}
 .f{background:#0b2a21}
@@ -161,7 +169,19 @@ ff([...segs.flatMap((s) => ["-i", s]), ...audioIn, "-filter_complex",
 // 커버: 훅 장면 1초 지점
 ff(["-ss", "1.0", "-i", join(work, "s0.mp4"), "-frames:v", "1", "-q:v", "3", join(OUT, "cover.jpg")]);
 
-const caption = [
+const caption = (R0 ? [
+  R0.title,
+  R0.keywords,
+  "",
+  ...R0.points,
+  "",
+  "뉴스·수급·일정 전체 카드와 출처는 프로필 피드 게시물에서 확인하세요. 저장해 두면 다시 보기 편합니다.",
+  "",
+  "종목 추천을 하지 않습니다. 수치는 카드에 표기된 시점 기준이며, 투자 판단과 책임은 본인에게 있습니다.",
+  "운영자는 카드에 언급된 종목을 보유하고 있을 수 있습니다.",
+  "",
+  R0.tags,
+] : [
   `${+m}월 ${+d}일(${WD}) ${data.mode === "pm" ? "장 마감" : "개장 전"} 시장, ${Math.round(total)}초 정리`,
   "",
   hook.join(" / "),
@@ -172,8 +192,8 @@ const caption = [
   "운영자는 카드에 언급된 종목을 보유하고 있을 수 있습니다.",
   "",
   "#마켓바이탈 #아침시황 #미국증시 #코스피 #경제뉴스",
-].join("\n");
+]).join("\n");
 mkdirSync(R, { recursive: true });
 for (const f of ["video.mp4", "cover.jpg"]) copyFileSync(join(OUT, f), join(R, f));
-writeFileSync(join(R, "post.json"), JSON.stringify({ id: `${id}_R`, format: "R", caption, first_comment: "", video: "video.mp4", cover: "cover.jpg", share_to_feed: false }, null, 2));
+writeFileSync(join(R, "post.json"), JSON.stringify({ id: `${id}_R`, format: "R", caption, first_comment: R0?.comment || "", video: "video.mp4", cover: "cover.jpg", share_to_feed: false }, null, 2));
 console.log(`후킹형 릴스 ${segs.length}장면 ${total.toFixed(1)}초 (배경: ${bg.split(/[\\/]/).pop()}, 배경음 ${hasAudio ? "있음" : "없음"}) → posts/${id}_R/`);

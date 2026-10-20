@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { seriesNo, lifeLine, hashtags, firstComment as engageComment, pmReel } from "./engage.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const kst = (d = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(d);
@@ -135,12 +136,19 @@ cards.push({ type: "outro", label: "마켓바이탈", lead: "평일 아침엔 �
 // 캡션 (아침 캡션과 달라야 중복으로 걸리지 않는다)
 const sign = (v) => (v > 0 ? "▲" : v < 0 ? "▼" : "");
 const tonight = cards.find((c) => c.type === "schedule");
+const NO = seriesNo(ROOT, DATE, true);
+const life = lifeLine(krw);
+const mac = (sym) => market.macro.find((x) => x.symbol === sym);
+const newsText = cards.filter((c) => c.type === "news").flatMap((c) => c.items.map((n) => n.h)).join(" ");
+const TAGS = hashtags({ pm: true, kospi, krw, sox: market.us.find((x) => x.symbol === "^SOX"), tnx: mac("^TNX"), oil: mac("CL=F"), gold: mac("GC=F"), streak: st, newsText });
+const event = tonight?.items?.[0] ? `${tonight.items[0].time} ${tonight.items[0].region} ${tonight.items[0].item}` : null;
 const caption = [
-  `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일(${wd(DATE)}) 장 마감 정리`,
+  `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일(${wd(DATE)}) 장 마감 정리 · 마감 바이탈 ${NO}일째`,
   "",
   `• 코스피 ${num(kospi.close)} ${sign(kospi.chg)}${Math.abs(kospi.chg).toFixed(2)}%, 외국인 ${eok(kospi.foreign)}원 (잠정)`,
   kosdaq ? `• 코스닥 ${num(kosdaq.close)} ${sign(kosdaq.chg)}${Math.abs(kosdaq.chg).toFixed(2)}%` : null,
   ok(krw) ? `• 원/달러 ${num(krw.price)}원 (${hm})` : null,
+  life ? `• 생활 체감: ${life}` : null,
   tonight ? `• 오늘 밤: ${tonight.items.slice(0, 2).map((x) => `${x.time} ${x.region} ${x.item}`).join(", ")}` : null,
   "",
   ...(() => { // 주요 뉴스 (카드에 실린 뉴스 제목, 국내 2·해외 2)
@@ -155,17 +163,18 @@ const caption = [
   "운영자는 카드에 언급된 종목을 보유하고 있을 수 있습니다.",
   "자료: Yahoo Finance, 다음 금융(수치), 각 언론 보도(뉴스 요약)",
   "",
-  "#마켓바이탈 #장마감 #코스피 #환율 #경제뉴스",
+  TAGS, // 고정 2개 + 그날 이슈 3개
 ].filter((x) => x !== null).join("\n");
-const QUESTIONS = ["오늘 장에서 가장 눈에 띈 흐름은 무엇이었나요?", "오늘 밤 가장 주목하는 일정은 무엇인가요?", "내일 아침 카드에서 꼭 보고 싶은 지표가 있나요?", "오늘 수급 중 가장 의외였던 부분은 무엇인가요?", "이번 주 국내 시장에서 가장 크게 느낀 변화는 무엇인가요?"];
-const firstComment = QUESTIONS[(new Date(DATE + "T12:00:00+09:00").getUTCDay() + 6) % 7 % QUESTIONS.length] + " 댓글로 알려 주세요.";
+const firstComment = engageComment(DATE, true); // 참여형 질문 (매수·매도·전망은 묻지 않음)
 
 const block = (process.env.BLOCKLIST || "").split(/[,\n]/).map((s) => s.trim()).filter((s) => s.length >= 2);
 if (block.filter((w) => (JSON.stringify(cards) + caption).toLowerCase().includes(w.toLowerCase())).length) fail("차단 목록 단어가 발견되어 발행하지 않습니다. (단어는 공개 로그에 출력하지 않음)");
 
 const total = cards.length;
 cards.forEach((c, i) => { c.page = `${i + 1} / ${total}`; });
-const data = { id: ID, date: DATE, mode: "pm", dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일 · 마감`, handle: "@market.vitals", cards };
+const data = { id: ID, date: DATE, mode: "pm", dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일 · 마감`, handle: "@market.vitals", cards,
+  // 릴스 문구 (make_reel_v2.mjs 가 쓴다)
+  reel: { ...pmReel({ kospi, kosdaq, krw, streakText: streak, es, event, life, no: NO }), tags: TAGS, comment: firstComment, mood: kospi.chg >= 0 ? "up" : "down" } };
 const post = { id: ID, caption, first_comment: firstComment,
   slides: cards.map((c, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, alt_text: `${i + 1}/${total}장. ${c.label}. ${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}` })) };
 const dir = join(ROOT, "posts", ID);

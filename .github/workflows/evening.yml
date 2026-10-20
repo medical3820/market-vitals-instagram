@@ -1,7 +1,7 @@
 name: 마켓바이탈 저녁 발행
 
 # 흐름: 클라우드 예약 작업(평일 17:35 KST)이 inbox/<날짜>-pm.json(저녁 뉴스)을 push
-#   → 숫자·일정 수집(오늘 국내 마감 포함) → 저녁 카드 만들기·검사 → 렌더링 → 캐러셀 + 스토리 발행 (릴스는 아침에만)
+#   → 숫자·일정 수집(오늘 국내 마감 포함) → 저녁 카드 만들기·검사 → 렌더링 → 캐러셀 + 후킹형 릴스 + 스토리(카드·릴스 영상) 발행
 # 오늘 국내가 휴장이면 build_pm.mjs 가 skip 을 내고 아무것도 올리지 않는다.
 # 커밋 메시지에 [연습] 이 있으면 카드만 만든다. 수동 실행 기본도 '만들어 보기'.
 
@@ -89,6 +89,12 @@ jobs:
         continue-on-error: true
         run: node scripts/make_reel.mjs "${{ steps.build.outputs.folder }}"
 
+      - name: 후킹형 릴스 만들기 (실패해도 캐러셀·스토리는 계속)
+        id: reel
+        if: steps.build.outputs.skip != 'true'
+        continue-on-error: true
+        run: node scripts/make_reel_v2.mjs "${{ steps.build.outputs.folder }}"
+
       - name: 카드 이미지 보관
         if: steps.build.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
@@ -97,6 +103,7 @@ jobs:
           path: |
             posts/${{ steps.build.outputs.folder }}/
             posts/${{ steps.build.outputs.folder }}_S/
+            posts/${{ steps.build.outputs.folder }}_R/
 
       - name: 저장소에 올리기
         if: env.PUBLISH == 'true' && steps.build.outputs.skip != 'true' && steps.dup.outputs.skip != 'true'
@@ -117,6 +124,16 @@ jobs:
           RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
         run: python3 scripts/publish.py "${{ steps.build.outputs.folder }}"
 
+      - name: 릴스 발행 (피드 공유 끔, 실패해도 계속)
+        id: reelpub
+        if: env.PUBLISH == 'true' && steps.build.outputs.skip != 'true' && steps.dup.outputs.skip != 'true' && steps.reel.outcome == 'success'
+        continue-on-error: true
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
+        run: python3 scripts/publish.py "${{ steps.build.outputs.folder }}_R"
+
       - name: 스토리 발행 (실패해도 계속)
         if: env.PUBLISH == 'true' && steps.build.outputs.skip != 'true' && steps.dup.outputs.skip != 'true' && steps.story.outcome == 'success'
         continue-on-error: true
@@ -125,6 +142,19 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
         run: python3 scripts/publish.py "${{ steps.build.outputs.folder }}_S"
+
+      - name: 릴스 영상을 스토리에도 올리기 (릴스가 올라간 날만, 실패해도 계속)
+        if: env.PUBLISH == 'true' && steps.build.outputs.skip != 'true' && steps.dup.outputs.skip != 'true' && steps.reelpub.outcome == 'success'
+        continue-on-error: true
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
+          F: ${{ steps.build.outputs.folder }}
+        run: |
+          mkdir -p "posts/${F}_RS"
+          python3 -c 'import json,sys; f=sys.argv[1]; json.dump({"id": f + "_RS", "story": True, "video_src": f + "_R/video.mp4"}, open("posts/%s_RS/post.json" % f, "w"))' "$F"
+          python3 scripts/publish.py "${F}_RS"
 
       - name: 발행 기록 올리기
         if: always() && env.PUBLISH == 'true' && steps.build.outputs.skip != 'true' && steps.dup.outputs.skip != 'true'
