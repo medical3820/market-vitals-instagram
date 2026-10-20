@@ -122,6 +122,7 @@ jobs:
         run: python3 scripts/publish.py "${{ steps.build.outputs.folder }}"
 
       - name: 릴스 발행 (피드 공유 끔, 실패해도 계속)
+        id: reelpub
         if: env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true' && steps.reel.outcome == 'success'
         continue-on-error: true
         env:
@@ -138,6 +139,19 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
         run: python3 scripts/publish.py "${{ steps.build.outputs.folder }}_S"
+
+      - name: 릴스 영상을 스토리에도 올리기 (릴스가 올라간 날만, 실패해도 계속)
+        if: env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true' && steps.reelpub.outcome == 'success'
+        continue-on-error: true
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
+          F: ${{ steps.build.outputs.folder }}
+        run: |
+          mkdir -p "posts/${F}_RS"
+          python3 -c 'import json,sys; f=sys.argv[1]; json.dump({"id": f + "_RS", "story": True, "video_src": f + "_R/video.mp4"}, open("posts/%s_RS/post.json" % f, "w"))' "$F"
+          python3 scripts/publish.py "${F}_RS"
 
       - name: 발행 기록 올리기 (실패해도 기록은 남겨 중복 발행을 막음)
         if: always() && env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true'

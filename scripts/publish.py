@@ -220,18 +220,26 @@ def reel_container(folder, post):
 def story_container(folder, post):
     """스토리(이미지 1장) 컨테이너를 만들고 FINISHED 까지 기다린 뒤 id 를 돌려준다. DRY_RUN 이면 None.
     스토리는 캡션이 없으므로 캡션 기준 중복 확인을 하지 않는다 (published.txt 로만 막는다)."""
-    url = "%s/posts/%s/%s" % (RAW_BASE, folder, post["image"])
+    # 영상 스토리: "video_src" 에 다른 폴더의 영상 경로(예: "MV20261020_R/video.mp4")를 적으면 그 영상을 올린다
+    src = post.get("video_src")
+    name = src or post["image"]
+    url = "%s/posts/%s" % (RAW_BASE, src) if src else "%s/posts/%s/%s" % (RAW_BASE, folder, post["image"])
     ok, info, length = check_url(url)
-    print("  %-10s %s  (%s, %.2fMB)" % (post["image"], "OK " if ok else "FAIL", info, length / 1024.0 / 1024.0))
+    print("  %-10s %s  (%s, %.2fMB)" % (name, "OK " if ok else "FAIL", info, length / 1024.0 / 1024.0))
     if not ok:
-        die("스토리 이미지가 열리지 않음: %s" % info)
+        die("스토리 %s이 열리지 않음: %s" % ("영상" if src else "이미지", info))
     if DRY_RUN:
-        print("\nDRY_RUN=1 이므로 여기서 중단합니다. 스토리 이미지 URL은 정상입니다.")
+        print("\nDRY_RUN=1 이므로 여기서 중단합니다. 스토리 URL은 정상입니다.")
         return None
-    r = _request("POST", "%s/media" % IG_USER_ID, {"media_type": "STORIES", "image_url": url})
+    params = {"media_type": "STORIES"}
+    params["video_url" if src else "image_url"] = url
+    r = _request("POST", "%s/media" % IG_USER_ID, params)
     cid = r["id"]
     print("  스토리 컨테이너 %s" % cid)
-    wait_finished(cid)
+    if src:
+        wait_finished(cid, attempts=60, interval=10)
+    else:
+        wait_finished(cid)
     return cid
 
 
