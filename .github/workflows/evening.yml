@@ -48,11 +48,13 @@ jobs:
         with:
           node-version: 22
 
-      - name: 도구 설치
+      - name: 도구 설치 (명령마다 7분 제한, 멈추면 최대 3번 다시 시도)
+        timeout-minutes: 15
         run: |
-          npm ci --no-audit --no-fund
-          npx playwright install --with-deps chromium
-          sudo apt-get install -y fonts-noto-cjk ffmpeg > /dev/null
+          try() { for i in 1 2 3; do timeout 420 "$@" && return 0; echo "다시 시도 $i: $*"; sleep 5; done; return 1; }
+          try npm ci --no-audit --no-fund
+          try npx playwright install --with-deps chromium
+          try sudo apt-get install -y fonts-noto-cjk ffmpeg > /dev/null
 
       - name: 토큰·계정 확인 (게시물은 올리지 않음)
         env:
