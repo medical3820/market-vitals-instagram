@@ -1,4 +1,6 @@
 date,id,type,likes,comments,reach,saved,shares,views,link
+2026-10-26,18101468141437148,VIDEO,0,1,140,0,0,151,https://www.instagram.com/reel/De84DJFifR9/
+2026-10-26,18361334290301678,CAROUSEL_ALBUM,0,1,0,0,0,0,https://www.instagram.com/p/De84BZWkQYZ/
 2026-10-24,18159168601505725,CAROUSEL_ALBUM,0,1,2,0,0,2,https://www.instagram.com/p/De3DSyynFX_/
 2026-10-23,17912341950507439,VIDEO,0,1,143,0,0,165,https://www.instagram.com/reel/De0BeqJHMuh/
 2026-10-23,18130790647833853,CAROUSEL_ALBUM,0,1,0,0,0,0,https://www.instagram.com/p/De0BZ0OG6qc/
@@ -11,8 +13,8 @@ date,id,type,likes,comments,reach,saved,shares,views,link
 2026-10-21,18103388075038832,VIDEO,0,1,126,0,0,131,https://www.instagram.com/reel/Deu3z79Ck3T/
 2026-10-21,17882971989626870,CAROUSEL_ALBUM,0,1,0,0,0,0,https://www.instagram.com/p/Deu3xJzj2qT/
 2026-10-20,18134145517824459,VIDEO,1,1,128,0,0,141,https://www.instagram.com/reel/DetbKOCghPW/
-2026-10-20,18103471568647203,CAROUSEL_ALBUM,0,1,0,0,0,0,https://www.instagram.com/p/DetbH1ZGydZ/
-2026-10-20,18388120699234508,VIDEO,0,0,129,0,0,138,https://www.instagram.com/reel/DesTA-zFU4p/
+2026-10-20,18103471568647203,CAROUSEL_ALBUM,0,1,,,,,https://www.instagram.com/p/DetbH1ZGydZ/
+2026-10-20,18388120699234508,VIDEO,0,0,,,,,https://www.instagram.com/reel/DesTA-zFU4p/
 2026-10-20,17920541106244418,CAROUSEL_ALBUM,0,1,,,,,https://www.instagram.com/p/DesS8t4Ab0w/
 2026-10-19,18089069234689796,CAROUSEL_ALBUM,0,1,,,,,https://www.instagram.com/p/Deq2V8sFr8Q/
 2026-10-19,17925643644441130,VIDEO,0,0,,,,,https://www.instagram.com/reel/Depu6CtiH_5/
@@ -27,5 +29,3 @@ date,id,type,likes,comments,reach,saved,shares,views,link
 2026-10-14,18159013309504924,CAROUSEL_ALBUM,0,1,,,,,https://www.instagram.com/p/Ded-U8amyds/
 2026-10-14,17992713927051137,VIDEO,1,0,,,,,https://www.instagram.com/reel/Dec2x1WAARn/
 2026-10-14,18105180890297668,CAROUSEL_ALBUM,2,3,,,,,https://www.instagram.com/p/Dec2vH-D81I/
-2026-10-13,18134831986737085,CAROUSEL_ALBUM,2,1,,,,,https://www.instagram.com/p/DebZmhjlScq/
-2026-10-13,18074684162584493,VIDEO,1,0,,,,,https://www.instagram.com/reel/DeaRTMciIt6/
