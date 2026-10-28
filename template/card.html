@@ -62,6 +62,8 @@
   .rows.tight .row{padding:1.7cqw 0}
   .rows.tight .v{font-size:4.4cqw}
   .rows.tight .nm{font-size:3.6cqw}
+  .rows.dense .row{padding:1.15cqw 0}
+  .rows.dense .nm small{display:inline;margin:0 0 0 1.4cqw}
   .grp{margin-top:3.6cqw}
   .grp .gt{font-size:2.8cqw;font-weight:800;color:var(--mark);letter-spacing:.02em}
   .grp .rows{margin-top:1cqw}
@@ -129,6 +131,22 @@
   .has-why .fl{padding:2.4cqw 3cqw}
   .has-why .fl .it{margin-top:1.2cqw}
   .has-why .why{margin-top:2.4cqw}
+  /* 간밤 해외 지표 결과: 실제 값 크게, 예상·이전 작게, 예상 대비 꼬리표 */
+  .res{margin-top:3.6cqw;display:flex;flex-direction:column}
+  .rs{display:grid;grid-template-columns:auto 1fr auto;gap:1cqw 2.6cqw;align-items:center;padding:2.4cqw 0;border-bottom:.25cqw solid var(--line)}
+  .rs:last-child{border-bottom:0}
+  .rs .rg{grid-row:span 2;font-size:2.6cqw;font-weight:800;color:var(--bg);background:var(--mark);border-radius:1.2cqw;padding:.6cqw 1.6cqw;white-space:nowrap}
+  .rs .it{font-size:3.5cqw;font-weight:800;line-height:1.3}
+  .rs .ac{grid-row:span 2;text-align:right;font-size:5.4cqw;font-weight:900;letter-spacing:-.02em;white-space:nowrap}
+  .rs .fp{font-size:2.7cqw;color:var(--dim);font-weight:700}
+  .rs .tg{display:inline-block;margin-left:1.2cqw;font-size:2.4cqw;font-weight:800;padding:.3cqw 1.2cqw;border-radius:1cqw;background:var(--panel);color:var(--fg)}
+  .res-src{margin-top:2cqw;font-size:2.3cqw;color:var(--dim);font-weight:700}
+  /* 나라별 한 줄 */
+  .ctry{margin-top:4cqw;display:flex;flex-direction:column;gap:2.2cqw}
+  .ct{background:var(--panel);border-radius:2.6cqw;padding:2.8cqw 3.4cqw;display:grid;grid-template-columns:13cqw 1fr;gap:.8cqw 2.6cqw;align-items:baseline}
+  .ct b{font-size:3.6cqw;font-weight:900;color:var(--mark)}
+  .ct span{font-size:3.5cqw;font-weight:700;line-height:1.4}
+  .ct small{grid-column:2;font-size:2.3cqw;color:var(--dim);font-weight:700}
   .foot{margin-top:auto;padding-top:2.6cqw;display:flex;justify-content:space-between;align-items:flex-end;gap:3cqw;font-size:2.4cqw;color:var(--dim);font-weight:700;line-height:1.4}
   .foot span:last-child{white-space:nowrap}
   .cover .foot,.outro .foot{margin-top:3cqw}
@@ -154,6 +172,8 @@
 <script>
 (function(){
   const D = JSON.parse(document.getElementById('data').textContent);
+  // 요일별 배경색 (scripts/themes.mjs). 없으면 기본 딥그린.
+  if (D.theme) for (const k of ['bg', 'panel', 'line', 'dim', 'mark']) if (D.theme[k]) document.documentElement.style.setProperty('--' + k, D.theme[k]);
   document.getElementById('meta').textContent = `${D.date} · 1080×1350 캐러셀 ${D.cards.length}장`;
   const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
   const dir = c => c == null ? 'flat' : c > 0 ? 'up' : c < 0 ? 'down' : 'flat';
@@ -174,7 +194,7 @@
     rows: c => `${top(c)}<div class="h">${esc(c.title)}</div>${rows(c.rows, c.rows.length > 5 ? 'tight' : '')}${why(c)}${foot(c)}`,
 
     groups: c => `${top(c)}<div class="h">${esc(c.title)}</div>${c.groups.map(g => `
-      <div class="grp"><div class="gt">${esc(g.title)}</div>${rows(g.rows, 'tight')}</div>`).join('')}${why(c)}${foot(c)}`,
+      <div class="grp"><div class="gt">${esc(g.title)}</div>${rows(g.rows, c.groups.reduce((n, x) => n + x.rows.length, 0) > 6 ? 'tight dense' : 'tight')}</div>`).join('')}${why(c)}${foot(c)}`,
 
     bars: c => {
       const max = Math.max(...c.items.map(i => Math.abs(i.chg)), 0.01);
@@ -202,6 +222,14 @@
 
     schedule: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="sched">${c.items.map(x => `
       <div class="sc"><div class="tm">${esc(x.time)}</div><div class="it">${esc(x.item)}</div>${x.region ? `<span class="rg">${esc(x.region)}</span>` : '<span></span>'}</div>`).join('')}</div>${foot(c)}`,
+
+    results: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="res">${c.items.map(x => `
+      <div class="rs"><span class="rg">${esc(x.region)}</span><div class="it">${esc(x.item)}</div><div class="ac num">${esc(x.actual)}</div>
+      <div class="fp num">예상 ${esc(x.forecast || '-')} · 이전 ${esc(x.previous || '-')}${x.tag ? `<span class="tg">${esc(x.tag)}</span>` : ''}</div></div>`).join('')}</div>
+      <div class="res-src">실제 값 출처: ${esc(c.src)}</div>${foot(c)}`,
+
+    countries: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="ctry">${c.items.map(x => `
+      <div class="ct"><b>${esc(x.region)}</b><span>${esc(x.t)}</span><small>출처: ${esc(x.src)}</small></div>`).join('')}</div>${foot(c)}`,
 
     outro: c => `${top(c)}<div class="lead">${esc(c.lead)}</div>
       <div class="rules">${c.rules.map(r => `<div>${esc(r)}</div>`).join('')}</div>

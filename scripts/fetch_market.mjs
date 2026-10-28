@@ -7,7 +7,7 @@
 
 import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { REGION, koTitle, keepEvent } from "./calendar_map.mjs";
+import { REGION, koTitle, keepEvent, periodOf } from "./calendar_map.mjs";
 
 const OUT = process.argv[2] || "market.json";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36";
@@ -101,7 +101,7 @@ async function calendar() {
       const at = new Date(e.date);
       if (isNaN(at)) continue;
       const k = kstParts(at);
-      ev.push({ at: at.toISOString(), kstDate: k.ymd, time: k.hm, region: REGION[e.country], item: name, impact: e.impact });
+      ev.push({ at: at.toISOString(), kstDate: k.ymd, time: k.hm, region: REGION[e.country], item: name, impact: e.impact, per: periodOf(e.title), forecast: e.forecast || "", previous: e.previous || "" });
     }
     // 같은 시각·지역·지표 이름은 한 번만
     const seen = new Set();
@@ -116,7 +116,7 @@ async function calendar() {
 const now = new Date();
 const { ymd: todayKST, hm: nowHM } = kstParts(now);
 
-const [us, futures, asia, macro, sectors, kospi, kosdaq, events] = await Promise.all([
+const [us, futures, asia, macro, sectors, kospi, kosdaq, events, europe, fx] = await Promise.all([
   Promise.all([
     yahoo("^GSPC", "S&P 500", { sub: "대형주 500" }),
     yahoo("^IXIC", "나스닥", { sub: "기술주 중심" }),
@@ -154,12 +154,24 @@ const [us, futures, asia, macro, sectors, kospi, kosdaq, events] = await Promise
   daum("KOSPI", todayKST, nowHM),
   daum("KOSDAQ", todayKST, nowHM),
   calendar(),
+  Promise.all([
+    yahoo("^GDAXI", "독일 DAX", { sub: "독일" }),
+    yahoo("^STOXX50E", "유로스톡스 50", { sub: "유로존" }),
+    yahoo("^FTSE", "FTSE 100", { sub: "영국" }),
+    yahoo("^FCHI", "CAC 40", { sub: "프랑스" }),
+  ]),
+  // 주요 통화 (달러 기준). 원화 환산(100엔·1유로·1위안당 원)은 build 에서 원/달러와 곱해 만든다.
+  Promise.all([
+    yahoo("JPY=X", "엔/달러", { live: true }),
+    yahoo("EURUSD=X", "유로/달러", { live: true }),
+    yahoo("CNY=X", "위안/달러", { live: true }),
+  ]),
 ]);
 
 const out = {
   fetchedAt: now.toISOString(),
   fetchedKST: `${todayKST} ${nowHM}`,
-  us, futures, asia, macro, sectors,
+  us, futures, asia, macro, sectors, europe, fx,
   kr: { kospi, kosdaq },
   events,
   errors,

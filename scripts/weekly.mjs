@@ -7,6 +7,7 @@
 import { writeFileSync, mkdirSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { THEMES } from "./themes.mjs";
 import { koTitle, keepEvent } from "./calendar_map.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -142,7 +143,7 @@ if (block.filter((w) => allText.toLowerCase().includes(w.toLowerCase())).length)
 
 const total = cards.length;
 cards.forEach((c, i) => { c.page = `${i + 1} / ${total}`; });
-const data = { id: ID, date: FRI, dateLabel: `${range} 주간`, handle: "@market.vitals", cards };
+const data = { id: ID, date: FRI, dateLabel: `${range} 주간`, handle: "@market.vitals", cards, theme: THEMES[5] }; // 토요일 주간 정리는 에스프레소 색
 const post = { id: ID, caption, first_comment: "다음 주 가장 주목하는 경제 일정은 무엇인가요? 댓글로 알려 주세요.",
   slides: cards.map((c, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, alt_text: `${i + 1}/${total}장. ${c.label}. ${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}` })) };
 const out = join(ROOT, "posts", ID);

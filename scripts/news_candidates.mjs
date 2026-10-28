@@ -6,6 +6,8 @@
 // 사용: node scripts/news_candidates.mjs 2026-10-13 [pm] > inbox/2026-10-13.candidates.txt
 // 기간: 아침(기본)은 직전 평일 15:30(KST) ~ 실행 시각(월요일이면 금요일 15:30부터), 저녁(pm)은 그날 06:00 ~ 실행 시각.
 
+import { REGION, koTitle, keepEvent, periodOf } from "./calendar_map.mjs";
+
 const DATE = process.argv[2] || new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date());
 const PM = process.argv[3] === "pm";
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36";
@@ -83,5 +85,14 @@ out.push(`# 뉴스 후보 ${DATE}${PM ? " 저녁" : ""} (기간: ${fmt(since)} ~
 out.push("# 형식: 시각 | 언론사 | 제목 | 링크. 같은 사실이 두 언론사 이상에 있을 때만 뉴스로 쓴다.");
 if (failed.length) out.push("# 수집 실패: " + failed.join(" / "));
 for (const x of uniq) out.push(`${fmt(x.when)} | ${x.outlet} | ${x.title} | ${x.link}`);
+// 기간 안에 발표된 해외 주요 지표 (예상·이전 값). 예약 작업이 실제 발표값을 기사로 확인해 inbox.results 에 쓴다.
+try {
+  const r = await fetch("https://nfs.faireconomy.media/ff_calendar_thisweek.json", { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(20000) });
+  const list = await r.json();
+  const rel = list.filter((e) => keepEvent(e) && koTitle(e.title) && new Date(e.date) >= since && new Date(e.date) <= new Date() && (e.forecast || e.previous));
+  out.push("");
+  out.push(`# 발표된 해외 지표 (${rel.length}건) — 형식: 발표 시각 | 지역 | 지표 | 예상 | 이전. 실제 값은 기사 두 곳에서 같은 값일 때만 results 에 씁니다.`);
+  for (const e of rel) out.push(`${fmt(new Date(e.date))} | ${REGION[e.country]} | ${koTitle(e.title)}${periodOf(e.title) ? " (" + periodOf(e.title) + ")" : ""} | 예상 ${e.forecast || "-"} | 이전 ${e.previous || "-"}`);
+} catch (e) { out.push("# 발표된 해외 지표: 경제 캘린더 수집 실패 (" + e.message + ")"); }
 console.log(out.join("\n"));
 if (!uniq.length) process.exitCode = 1;

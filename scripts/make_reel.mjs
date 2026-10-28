@@ -16,6 +16,7 @@ const id = process.argv[2];
 if (!id) { console.error("사용: node scripts/make_reel.mjs <폴더ID>"); process.exit(1); }
 const src = join(ROOT, "posts", id);
 const data = JSON.parse(readFileSync(join(src, "data.json"), "utf8"));
+const T = { bg: "#0e3b2e", panel: "#185040", dim: "#a9d3c2", mark: "#7ff0bf", ...(data.theme || {}) }; // 요일별 배경색 (themes.mjs)
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const STORY_ONLY = process.env.STORY_ONLY === "1" || data.mode === "pm"; // 저녁은 스토리만 (릴스는 하루 한 번, 아침)
 
@@ -38,12 +39,12 @@ const frameHTML = (img, foot) => `<!doctype html><meta charset="utf-8">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700;900&display=swap">
 <style>
 body{margin:0}
-.f{width:1080px;height:1920px;background:#0e3b2e;position:relative;overflow:hidden;font-family:"Gothic A1","Noto Sans CJK KR",sans-serif;word-break:keep-all}
+.f{width:1080px;height:1920px;background:${T.bg};position:relative;overflow:hidden;font-family:"Gothic A1","Noto Sans CJK KR",sans-serif;word-break:keep-all}
 .h{position:absolute;left:72px;right:72px;top:120px;display:flex;flex-direction:column;gap:14px}
-.h b{color:#7ff0bf;font-size:44px;font-weight:900;letter-spacing:-.02em}
+.h b{color:${T.mark};font-size:44px;font-weight:900;letter-spacing:-.02em}
 .h span{color:#fff;font-size:54px;font-weight:900;letter-spacing:-.04em}
 .c{position:absolute;left:0;top:300px;width:1080px;height:1350px;display:block}
-.b{position:absolute;left:72px;right:72px;bottom:150px;color:#a9d3c2;font-size:36px;font-weight:700;text-align:center}
+.b{position:absolute;left:72px;right:72px;bottom:150px;color:${T.dim};font-size:36px;font-weight:700;text-align:center}
 </style>
 <div class="f"><div class="h"><b>마켓바이탈</b><span>${head}</span></div>
 <img class="c" src="${pathToFileURL(img).href}"><div class="b">${foot}</div></div>`;

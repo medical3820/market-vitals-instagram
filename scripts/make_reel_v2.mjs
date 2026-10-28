@@ -16,6 +16,7 @@ const id = process.argv[2];
 if (!id) { console.error("사용: node scripts/make_reel_v2.mjs <폴더ID> [배경.mp4]"); process.exit(1); }
 const src = join(ROOT, "posts", id);
 const data = JSON.parse(readFileSync(join(src, "data.json"), "utf8"));
+const T = { bg: "#0e3b2e", panel: "#185040", dim: "#a9d3c2", mark: "#7ff0bf", ...(data.theme || {}) }; // 요일별 배경색 (themes.mjs)
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const FFPROBE = process.env.FFPROBE || FFMPEG.replace(/ffmpeg(\.exe)?$/, "ffprobe$1");
 
@@ -42,7 +43,7 @@ if (!bg || !existsSync(bg)) { console.error("배경 영상 없음 — 기존 릴
 const PM = data.mode === "pm";
 const ORDER = PM
   ? [["flows", 2.4], ["groups:환율 · 아시아 마감", 2.2], ["news:국내 경제뉴스", 2.4], ["rows:미국 지수선물 · 오늘 밤", 2.2], ["schedule", 2.0]]
-  : [["news:해외 경제뉴스", 2.4], ["rows:미국 증시", 2.2], ["rows:금리 · 환율 · 원자재", 2.2], ["flows", 2.4], ["schedule", 2.0]];
+  : [["news:해외 경제뉴스", 2.4], ["rows:미국 증시", 2.2], ["results", 2.4], ["rows:금리 · 환율 · 원자재", 2.2], ["flows", 2.4], ["schedule", 2.0]];
 const picks = [];
 for (const [key, sec] of ORDER) {
   const [type, label] = key.split(":");
@@ -90,12 +91,12 @@ const hookHTML = `<!doctype html><meta charset="utf-8">${FONT}<style>${BASE}
 <div class="bot">${esc(bottom)}</div></div>`;
 // 2) 카드 장면: 어두운 배경 + 카드 (확대 효과는 ffmpeg)
 const cardHTML = (img, i, n) => `<!doctype html><meta charset="utf-8">${FONT}<style>${BASE}
-.f{background:#0b2a21}
-.t{position:absolute;left:80px;right:80px;top:140px;display:flex;justify-content:space-between;color:#7ff0bf;font-size:40px;font-weight:900}
-.t span{color:#a9d3c2;font-weight:700}
+.f{background:${T.bg}}
+.t{position:absolute;left:80px;right:80px;top:140px;display:flex;justify-content:space-between;color:${T.mark};font-size:40px;font-weight:900}
+.t span{color:${T.dim};font-weight:700}
 img{position:absolute;left:0;top:285px;width:1080px;height:1350px}
-.bar{position:absolute;left:80px;right:80px;bottom:200px;height:10px;background:#185040;border-radius:5px}
-.bar i{position:absolute;left:0;top:0;bottom:0;width:${Math.round(((i + 1) / n) * 100)}%;background:#7ff0bf;border-radius:5px}
+.bar{position:absolute;left:80px;right:80px;bottom:200px;height:10px;background:${T.panel};border-radius:5px}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:${Math.round(((i + 1) / n) * 100)}%;background:${T.mark};border-radius:5px}
 </style><div class="f"><div class="t">마켓바이탈<span>${when}</span></div><img src="${pathToFileURL(img).href}"><div class="bar"><i></i></div></div>`;
 // 3) 마무리 오버레이(투명): 팔로우 안내
 const ctaHTML = `<!doctype html><meta charset="utf-8">${FONT}<style>${BASE}
@@ -156,7 +157,10 @@ for (let i = 1; i < segs.length; i++) {
   prev = `[x${i}]`;
 }
 const hasAudio = execFileSync(FFPROBE, ["-v", "error", "-select_streams", "a", "-show_entries", "stream=index", "-of", "csv=p=0", bg]).toString().trim() !== "";
-const audioIn = hasAudio ? ["-stream_loop", "-1", "-i", bg] : ["-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=44100"];
+// 배경음은 필요한 길이만큼 먼저 잘라 둔다 — 무한 반복 입력을 영상 합치기에 바로 넣으면 ffmpeg 가 멈추는 일이 있었다
+const bgm = join(work, "bgm.m4a");
+if (hasAudio) ff(["-stream_loop", "-1", "-i", bg, "-vn", "-t", (total + 0.5).toFixed(3), "-c:a", "aac", "-b:a", "160k", bgm]);
+const audioIn = hasAudio ? ["-i", bgm] : ["-f", "lavfi", "-t", (total + 0.5).toFixed(3), "-i", "anullsrc=channel_layout=stereo:sample_rate=44100"];
 const ai = segs.length;
 // 다 만든 뒤에만 posts/<ID>_R 로 옮긴다 — 중간에 실패해도 기본 릴스가 그대로 남도록
 const R = join(ROOT, "posts", `${id}_R`);

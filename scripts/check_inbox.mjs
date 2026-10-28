@@ -46,5 +46,28 @@ if (j.schedule_kr != null) {
   });
 }
 
+if (j.results != null) {
+  if (!Array.isArray(j.results) || j.results.length > 5) problems.push("results 는 0~5건 배열이어야 합니다");
+  else j.results.forEach((x, i) => {
+    const at = `해외 지표 ${i + 1}번`;
+    for (const k of ["region", "item", "actual", "src"]) if (!x[k]) problems.push(`${at}: ${k} 없음`);
+    if (!["미국", "중국", "유럽", "일본", "영국"].includes(x.region)) problems.push(`${at}: region 은 미국·중국·유럽·일본·영국 중 하나`);
+    if ((x.item || "").length > 22) problems.push(`${at}: item ${x.item.length}자 (22자 이내)`);
+    if (String(x.actual || "").length > 10) problems.push(`${at}: actual 10자 이내`);
+    if (!/[·,]/.test(x.src || "")) problems.push(`${at}: 실제 값을 확인한 언론 두 곳 이상 (예: 연합뉴스·한국경제)`);
+  });
+}
+if (j.countries != null) {
+  const KEYS = ["us", "cn", "eu", "jp"];
+  if (typeof j.countries !== "object" || Array.isArray(j.countries)) problems.push("countries 는 { us|cn|eu|jp: { t, src } } 형식이어야 합니다");
+  else for (const [k, w] of Object.entries(j.countries)) {
+    if (!KEYS.includes(k)) problems.push(`countries.${k}: 쓸 수 있는 키는 ${KEYS.join(", ")}`);
+    if (!w || !w.t || !w.src) { problems.push(`countries.${k}: t 와 src 가 필요합니다`); continue; }
+    if (w.t.length > 34) problems.push(`countries.${k}: ${w.t.length}자 (34자 이내)`);
+    if (!/[·,]/.test(w.src)) problems.push(`countries.${k}: 출처가 두 곳 이상이어야 합니다`);
+    const bad = BANNED.filter((b) => w.t.includes(b)); if (bad.length) problems.push(`countries.${k}: 쓰면 안 되는 표현 (${bad.join(", ")})`);
+  }
+}
+
 if (problems.length) { console.error("고칠 점:\n- " + problems.join("\n- ")); process.exit(1); }
 console.log("통과: " + file);

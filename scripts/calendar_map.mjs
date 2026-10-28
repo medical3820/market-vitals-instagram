@@ -24,3 +24,5 @@ export const koTitle = (t) => {
   return null;
 };
 export const keepEvent = (e) => REGION[e.country] && (e.impact === "High" || (e.country === "USD" && e.impact === "Medium"));
+// 비교 기준 꼬리표 (m/m → 전월비). 같은 지표의 전월비·전년비를 구분할 때 쓴다.
+export const periodOf = (t) => ({ "m/m": "전월비", "y/y": "전년비", "q/q": "전분기비" })[(t.match(/(m\/m|y\/y|q\/q)$/) || [])[1]] || "";

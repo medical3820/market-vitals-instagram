@@ -12,6 +12,8 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { resultsItems, srcUnion, countryItems, wonCrossRows } from "./global.mjs";
+import { pickTheme } from "./themes.mjs";
 import { seriesNo, lifeLine, hashtags, firstComment as engageComment, amReel } from "./engage.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -119,6 +121,13 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
     rows: market.us.filter(ok).map(row), asof: `미국 현지 ${mdw(usDate)} 마감` });
 }
 
+// 3-1 간밤 해외 지표 결과 (실제 값은 예약 작업이 기사 두 곳에서 확인, 예상·이전은 경제 캘린더)
+{
+  const items = resultsItems(inbox.results, warnings);
+  add({ type: "results", label: "간밤 해외 경제지표", title: "간밤 발표된\n해외 경제지표 결과", items, src: srcUnion(items),
+    asof: "예상·이전은 경제 캘린더 기준 · 예상 대비는 숫자 비교" }, items.length ? null : "발표된 주요 지표 없음");
+}
+
 // 4 미국 업종
 {
   const s = market.sectors.filter((x) => ok(x) && x.date === usDate).sort((a, b) => b.chg - a.chg);
@@ -140,6 +149,20 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
     asof: `금리·달러 ${md(usDate)} 마감 · 그 외 ${fetchedMD} ${fetchedHM}` }, m.length < 4 ? "지표 부족" : null);
 }
 
+// 5-1 유럽 증시 · 원화로 본 주요 통화
+{
+  const eu = (market.europe || []).filter((x) => ok(x) && fresh(x.date, 5));
+  const fx = wonCrossRows(market, num);
+  const best = eu.length ? [...eu].sort((a, b) => Math.abs(b.chg) - Math.abs(a.chg))[0] : null;
+  add({ type: "groups", label: "유럽 증시 · 주요 통화",
+    title: [best && `${best.name} ${pct(best.chg)}`, fx[0] && `100엔 ${fx[0].value}`].filter(Boolean).join("\n") || "유럽 증시와 주요 통화",
+    groups: [
+      ...(eu.length ? [{ title: `유럽 증시 · ${md(eu[0].date)} 마감`, rows: eu.map((x) => ({ ...row(x), sub: "" })) }] : []),
+      ...(fx.length ? [{ title: `원화로 본 주요 통화 · ${fetchedMD} ${fetchedHM}`, rows: fx }] : []),
+    ],
+    asof: "유럽은 현지 마감 · 원화 환산은 원/달러와 달러 대비 환율로 계산" }, eu.length + fx.length < 3 ? "유럽·통화 데이터 부족" : null);
+}
+
 // 6 지수선물·아시아
 {
   const f = market.futures.filter(ok), a = market.asia.filter(ok);
@@ -151,6 +174,13 @@ newsCard("해외 경제뉴스", "간밤 세계 시장을\n움직인 뉴스", inb
       { title: "아시아 증시 · 최근 마감", rows: a.map((x) => ({ ...row(x), sub: `${x.sub} · ${md(x.date)}` })) },
     ],
     asof: "선물은 전일 정산가 대비" }, f.length < 2 ? "선물 데이터 없음" : null);
+}
+
+// 6-1 나라별 한 줄 (예약 작업이 두 곳 이상 언론에서 확인한 사실)
+{
+  const items = countryItems(inbox.countries, warnings);
+  add({ type: "countries", label: "나라별 경제 상황", title: "미국·중국·유럽·일본\n요즘 경제 한 줄", items,
+    asof: inbox.newsAsof || `${mdw(DATE)} 언론 보도 기준` }, items.length < 2 ? "나라별 한 줄 2건 미만" : null);
 }
 
 // 7 국내 뉴스
@@ -260,7 +290,7 @@ if (hits) fail(`차단 목록 단어가 ${hits}개 발견되었습니다. 발행
 // ── 출력 ──────────────────────────────────────────────────────────────
 const total = cards.length;
 cards.forEach((c, i) => { c.page = `${i + 1} / ${total}`; });
-const data = { id: ID, date: DATE, dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일`, handle: "@market.vitals", cards,
+const data = { id: ID, date: DATE, dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일`, handle: "@market.vitals", cards, theme: pickTheme(DATE, false),
   // 릴스 문구 (make_reel_v2.mjs 가 쓴다)
   reel: { ...amReel({ spx, ndx, dji, kospi, krw, tnx: mac("^TNX"), newsHead: cards.find((c) => c.type === "news" && c.label === "해외 경제뉴스")?.items?.[0]?.h, event, life, no: NO }),
     tags: TAGS, comment: firstComment, mood: [spx, ndx, dji].reduce((t, x) => t + (x.chg || 0), 0) >= 0 ? "up" : "down" } };

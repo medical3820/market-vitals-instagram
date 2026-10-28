@@ -8,6 +8,8 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { resultsItems, srcUnion, countryItems, wonCrossRows } from "./global.mjs";
+import { pickTheme } from "./themes.mjs";
 import { seriesNo, lifeLine, hashtags, firstComment as engageComment, pmReel } from "./engage.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -78,12 +80,12 @@ cards.push({ type: "flows", label: "국내 증시 · 오늘 마감", why: whyOf(
 
 // 3 환율·아시아 마감
 {
-  const fx = ["KRW=X", "DX-Y.NYB"].map((s) => market.macro.find((x) => x.symbol === s)).filter(ok);
+  const fx = [...["KRW=X"].map((s) => market.macro.find((x) => x.symbol === s)).filter(ok).map(row), ...wonCrossRows(market, num)];
   const asia = market.asia.filter(ok);
   add({ type: "groups", label: "환율 · 아시아 마감", why: whyOf("fx"),
     title: ok(krw) ? `원/달러 ${num(krw.price)}원\n아시아 증시 마감` : "환율과 아시아 증시",
     groups: [
-      { title: `환율 · ${fmd} ${hm}`, rows: fx.map(row) },
+      { title: `환율 · ${fmd} ${hm}`, rows: fx },
       { title: "아시아 증시 · 오늘 마감", rows: asia.map((x) => ({ ...row(x), sub: `${x.sub} · ${md(x.date)}` })) },
     ], asof: "등락은 전일 종가 대비" }, asia.length < 2 ? "아시아 데이터 부족" : null);
 }
@@ -100,6 +102,16 @@ const newsCard = (label, title, items) => {
 };
 newsCard("국내 경제뉴스", "오늘 국내 시장을\n움직인 뉴스", inbox.domestic);
 newsCard("해외 경제뉴스", "오늘의 해외\n경제 소식", inbox.global);
+
+// 오늘 나온 해외 지표 (중국·일본 등 아시아 시간 발표) · 나라별 한 줄 — 예약 작업이 넣은 날만
+{
+  const items = resultsItems(inbox.results, warnings);
+  if (items.length) cards.push({ type: "results", label: "오늘 나온 해외 지표", title: "오늘 발표된\n해외 경제지표 결과", items, src: srcUnion(items),
+    asof: "예상·이전은 경제 캘린더 기준 · 예상 대비는 숫자 비교" });
+  const ct = countryItems(inbox.countries, warnings);
+  if (ct.length >= 2) cards.push({ type: "countries", label: "나라별 경제 상황", title: "미국·중국·유럽·일본\n요즘 경제 한 줄", items: ct,
+    asof: inbox.newsAsof || `${md(DATE)}(${wd(DATE)}) 언론 보도 기준` });
+}
 
 // 6 미국 선물
 {
@@ -172,7 +184,7 @@ if (block.filter((w) => (JSON.stringify(cards) + caption).toLowerCase().includes
 
 const total = cards.length;
 cards.forEach((c, i) => { c.page = `${i + 1} / ${total}`; });
-const data = { id: ID, date: DATE, mode: "pm", dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일 · 마감`, handle: "@market.vitals", cards,
+const data = { id: ID, date: DATE, mode: "pm", dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일 ${wd(DATE)}요일 · 마감`, handle: "@market.vitals", cards, theme: pickTheme(DATE, true),
   // 릴스 문구 (make_reel_v2.mjs 가 쓴다)
   reel: { ...pmReel({ kospi, kosdaq, krw, streakText: streak, es, event, life, no: NO }), tags: TAGS, comment: firstComment, mood: kospi.chg >= 0 ? "up" : "down" } };
 const post = { id: ID, caption, first_comment: firstComment,
