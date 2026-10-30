@@ -9,12 +9,12 @@ export const TOPICS = ["semis", "bigtech_ai", "fed_rates", "bonds", "dollar_fx",
 const BANNED = ["추천", "수혜", "목표가", "목표주가", "매수 의견", "매도 의견", "팔아라", "사라", "사야", "팔아야", "기회", "대박", "확실", "급등주", "대장주", "테마주", "관련주", "유망", "호재", "악재", "특징주"];
 const WD = ["일", "월", "화", "수", "목", "금", "토"];
 
-function pickPhoto(root, topic, mood, date) {
+function pickPhoto(root, topics, mood, date) {
   const dir = join(root, "assets", "photo");
   if (!existsSync(dir)) return null;
   const files = readdirSync(dir).filter((f) => f.endsWith(".jpg"));
   const day = Number(date.replaceAll("-", ""));
-  for (const prefix of [topic, `market_${mood}`, "market_"]) {
+  for (const prefix of [...topics, `market_${mood}`, "market_"]) {
     if (!prefix) continue;
     const list = files.filter((f) => f.startsWith(prefix + (prefix.endsWith("_") ? "" : "_")));
     if (list.length) return `../assets/photo/${list[day % list.length]}`; // render.html 이 work/ 에 있으므로 한 단계 위
@@ -44,7 +44,8 @@ export function coverCard({ root, date, pm, inboxCover, fallback, mood, warnings
     top: `${m}.${d} ${WD[new Date(date + "T12:00:00+09:00").getUTCDay()]}`,
     topSub: pm ? "장 마감 시장 브리핑" : "개장 전 시장 브리핑",
     context: c.context, hook: c.hook, sub: c.sub,
-    photo: pickPhoto(root, c.topic, mood, date),
+    // 주제가 없으면 아침은 뉴욕(us_up/down), 저녁은 서울(kospi_up/down) 사진
+    photo: pickPhoto(root, [c.topic, `${pm ? "kospi" : "us"}_${mood}`], mood, date),
     headline: c.hook, // 대체 텍스트·릴스 예비 문구용
   };
 }

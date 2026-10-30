@@ -30,24 +30,32 @@ export function lifeLine(krw) {
   return `100달러 결제하면 약 ${won(now)}` + (d >= 10 ? ` (전일보다 약 ${d.toLocaleString("en-US")}원 ${diff > 0 ? "더 듦" : "덜 듦"})` : " (전일과 비슷)");
 }
 
-// 해시태그 5개: 고정 2개 + 그날 크게 움직였거나 뉴스에 나온 주제 3개
+// 해시태그 5개 (인스타는 게시물당 5개 제한, 2025-12~). 검색 유입은 캡션·대체 텍스트 키워드가 더 크고, 해시태그는
+//   브랜드 1 + 사람들이 실제로 검색하는 넓은 주제 2 + 그날 크게 움직였거나 뉴스에 나온 주제 2 로 쓴다.
+//   이슈 태그도 검색량이 많은 짧은 말(#환율·#금리·#유가)을 쓰고 긴 합성어(#원달러환율·#미국채금리)는 피한다. 전략 메모: HASHTAGS.md
 export function hashtags({ pm, ndx, kospi, krw, sox, tnx, oil, gold, streak, newsText = "" }) {
   const c = []; // [점수, 태그]
   const mv = (x) => (x && x.chg != null ? Math.abs(x.chg) : 0);
+  const core = pm ? ["#주식", "#코스피"] : ["#미국주식", "#주식"];
   if (!pm && mv(ndx) >= 1) c.push([mv(ndx) * 2, "#나스닥"]);
-  if (mv(kospi) >= 1) c.push([mv(kospi) * 2, "#코스피"]);
-  if (mv(krw) >= 0.4 || /환율/.test(newsText)) c.push([mv(krw) * 5 + 1, "#원달러환율"]);
+  if (!pm && mv(kospi) >= 1) c.push([mv(kospi) * 2, "#코스피"]);
+  if (mv(krw) >= 0.4 || /환율/.test(newsText)) c.push([mv(krw) * 5 + 1, "#환율"]);
   if (mv(sox) >= 2 || /반도체/.test(newsText)) c.push([mv(sox) + 1, "#반도체"]);
-  if (mv(tnx) >= 1.5 || /국채|금리/.test(newsText)) c.push([mv(tnx) + 1, "#미국채금리"]);
-  if (mv(oil) >= 2 || /유가|원유/.test(newsText)) c.push([mv(oil) + 1, "#국제유가"]);
+  if (mv(tnx) >= 1.5 || /국채|금리/.test(newsText)) c.push([mv(tnx) + 1, "#금리"]);
+  if (mv(oil) >= 2 || /유가|원유/.test(newsText)) c.push([mv(oil) + 1, "#유가"]);
   if (mv(gold) >= 1.5 || /금값|금 가격/.test(newsText)) c.push([mv(gold) + 1, "#금값"]);
   if (/연준|FOMC|파월/.test(newsText)) c.push([3, "#연준"]);
-  if (Math.abs(streak || 0) >= 3) c.push([Math.abs(streak), streak > 0 ? "#외국인순매수" : "#외국인순매도"]);
-  const picked = [...new Set(c.sort((a, b) => b[0] - a[0]).map((x) => x[1]))].slice(0, 3);
-  for (const t of pm ? ["#코스피", "#증시마감", "#경제뉴스"] : ["#미국증시", "#코스피", "#경제뉴스"]) {
-    if (picked.length < 3 && !picked.includes(t)) picked.push(t);
-  }
-  return ["#마켓바이탈", pm ? "#장마감시황" : "#오늘시황", ...picked].join(" ");
+  if (/엔화|일본은행|엔\/달러/.test(newsText)) c.push([2, "#엔화"]);
+  if (/비트코인|가상자산/.test(newsText)) c.push([2, "#비트코인"]);
+  if (Math.abs(streak || 0) >= 3) c.push([Math.abs(streak), "#외국인"]);
+  const picked = [...new Set(c.sort((a, b) => b[0] - a[0]).map((x) => x[1]))].filter((t) => !core.includes(t)).slice(0, 2);
+  for (const t of pm ? ["#환율", "#경제뉴스"] : ["#코스피", "#경제뉴스"]) if (picked.length < 2 && !picked.includes(t)) picked.push(t);
+  return ["#마켓바이탈", ...core, ...picked].join(" ");
+}
+
+// 검색 키워드 줄: 인스타 검색은 캡션 앞부분 키워드를 본다. 사람들이 치는 말을 자연스러운 한 줄로.
+export function keywordLine(pm) {
+  return pm ? "오늘 주식 시황 · 코스피 마감 · 외국인 수급 · 환율 정리" : "오늘 주식 시황 · 미국 증시 마감 · 나스닥 · 코스피 개장 전 · 환율 정리";
 }
 
 // 참여형 첫 댓글 (요일별). 매수·매도·전망은 묻지 않는다.

@@ -11,7 +11,7 @@ import { fileURLToPath } from "node:url";
 import { resultsItems, srcUnion, countryItems, wonCrossRows } from "./global.mjs";
 import { pickTheme } from "./themes.mjs";
 import { coverCard } from "./cover.mjs";
-import { seriesNo, lifeLine, hashtags, firstComment as engageComment, pmReel } from "./engage.mjs";
+import { seriesNo, lifeLine, hashtags, firstComment as engageComment, pmReel, keywordLine } from "./engage.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const kst = (d = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(d);
@@ -165,6 +165,7 @@ const TAGS = hashtags({ pm: true, kospi, krw, sox: market.us.find((x) => x.symbo
 const event = tonight?.items?.[0] ? `${tonight.items[0].time} ${tonight.items[0].region} ${tonight.items[0].item}` : null;
 const caption = [
   `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일(${wd(DATE)}) 장 마감 정리 · 마감 바이탈 ${NO}일째`,
+  keywordLine(true),
   "",
   `• 코스피 ${num(kospi.close)} ${sign(kospi.chg)}${Math.abs(kospi.chg).toFixed(2)}%, 외국인 ${eok(kospi.foreign)}원 (잠정)`,
   kosdaq ? `• 코스닥 ${num(kosdaq.close)} ${sign(kosdaq.chg)}${Math.abs(kosdaq.chg).toFixed(2)}%` : null,
@@ -198,7 +199,7 @@ const data = { id: ID, date: DATE, mode: "pm", dateLabel: `${+DATE.slice(5, 7)}�
   // 릴스 문구 (make_reel_v2.mjs 가 쓴다)
   reel: { ...pmReel({ kospi, kosdaq, krw, streakText: streak, es, event, life, no: NO }), tags: TAGS, comment: firstComment, mood: kospi.chg >= 0 ? "up" : "down" } };
 const post = { id: ID, caption, first_comment: firstComment,
-  slides: cards.map((c, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, alt_text: `${i + 1}/${total}장. ${c.label}. ${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}` })) };
+  slides: cards.map((c, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, alt_text: `${i + 1}/${total}장. ${i === 0 ? `${md(DATE)}(${wd(DATE)}) 장 마감 주식 시황, 코스피 마감과 외국인 수급. ` : c.label + ". "}${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}` })) };
 const dir = join(ROOT, "posts", ID);
 mkdirSync(dir, { recursive: true });
 writeFileSync(join(dir, "data.json"), JSON.stringify(data, null, 2));

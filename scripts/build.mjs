@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 import { resultsItems, srcUnion, countryItems, wonCrossRows } from "./global.mjs";
 import { pickTheme } from "./themes.mjs";
 import { coverCard } from "./cover.mjs";
-import { seriesNo, lifeLine, hashtags, firstComment as engageComment, amReel } from "./engage.mjs";
+import { seriesNo, lifeLine, hashtags, firstComment as engageComment, amReel, keywordLine } from "./engage.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const kst = (d = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
@@ -266,6 +266,7 @@ const event = sched?.items?.[0] ? `${sched.items[0].time} ${sched.items[0].regio
 const sign = (v) => (v > 0 ? "▲" : v < 0 ? "▼" : "");
 const caption = [
   `${+DATE.slice(5, 7)}월 ${+DATE.slice(8)}일(${wd(DATE)}) 개장 전 시장 요약 · 바이탈 체크 ${NO}일째`,
+  keywordLine(false),
   "",
   `• 미국(${md(usDate)} 마감): S&P 500 ${sign(spx.chg)}${Math.abs(spx.chg).toFixed(2)}%, 나스닥 ${sign(ndx.chg)}${Math.abs(ndx.chg).toFixed(2)}%`,
   `• 코스피(${md(kospi.date)}): ${num(kospi.close)} ${sign(kospi.chg)}${Math.abs(kospi.chg).toFixed(2)}%, 외국인 ${eok(kospi.foreign)}원`,
@@ -306,7 +307,8 @@ const data = { id: ID, date: DATE, dateLabel: `${+DATE.slice(5, 7)}월 ${+DATE.s
   // 릴스 문구 (make_reel_v2.mjs 가 쓴다)
   reel: { ...amReel({ spx, ndx, dji, kospi, krw, tnx: mac("^TNX"), newsHead: cards.find((c) => c.type === "news" && c.label === "해외 경제뉴스")?.items?.[0]?.h, event, life, no: NO }),
     tags: TAGS, comment: firstComment, mood: [spx, ndx, dji].reduce((t, x) => t + (x.chg || 0), 0) >= 0 ? "up" : "down" } };
-const altOf = (c, i) => `${i + 1}/${total}장. ${c.label}. ${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}`;
+// 대체 텍스트도 검색에 쓰인다 — 표지에는 날짜와 검색 키워드를 넣는다
+const altOf = (c, i) => `${i + 1}/${total}장. ${i === 0 ? `${mdw(DATE)} 개장 전 주식 시황, 미국 증시 마감과 코스피. ` : c.label + ". "}${(c.headline || c.title || c.lead || "").replace(/\n/g, " ")}`;
 const post = {
   id: ID, caption, first_comment: firstComment,
   slides: cards.map((c, i) => ({ file: `${String(i + 1).padStart(2, "0")}.jpg`, alt_text: altOf(c, i) })),
