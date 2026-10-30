@@ -156,6 +156,43 @@
   .squeeze .grp{margin-top:2cqw}
   .squeeze .nw{padding:1.8cqw 0}
   .squeeze .why{margin-top:1.8cqw;padding:1.8cqw 3cqw}
+  /* 사진 표지: 위는 주제 사진, 아래로 어두워지는 바탕 위에 가운데 큰 글씨 + 강조색 */
+  .card.photo{background:#000}
+  .photo .ph{position:absolute;left:0;right:0;top:0;height:68%;background-size:cover;background-position:center}
+  .photo .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.25) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,.55) 70%,#000 100%)}
+  .photo .in{justify-content:flex-end;text-align:center;padding-bottom:5cqw}
+  .photo .tp{position:absolute;left:6cqw;right:6cqw;top:5.5cqw;display:flex;justify-content:space-between;font-size:3.2cqw;font-weight:800;color:#fff;text-shadow:0 .3cqw 1.6cqw rgba(0,0,0,.6)}
+  .photo .tp b{color:var(--hot,#ff4f9a);font-weight:900}
+  .photo .hl{font-size:8.2cqw;font-weight:900;line-height:1.2;letter-spacing:-.05em;color:#fff;white-space:pre-line;text-wrap:balance}
+  .photo .hl em{font-style:normal;color:var(--hot,#ff4f9a)}
+  .photo .sb2{margin-top:2.6cqw;font-size:7cqw;font-weight:900;line-height:1.2;letter-spacing:-.05em;color:var(--hot,#ff4f9a);white-space:pre-line}
+  .photo .hl,.photo .sb2,.photo .sw,.photo .tp{position:relative;z-index:1}
+  .photo .tp{position:absolute}
+  .photo .sw{margin-top:6cqw;font-size:3.6cqw;font-weight:800;color:#fff}
+  /* 사진 표지 B(잡지형): 사진 꽉 채움, 아래 왼쪽 정렬 — 맥락 한 줄 / 두 줄 제목 / 강조색 보조 줄 / 짧은 막대 + 계정 */
+  .card.mag{background:#000}
+  .mag .ph{position:absolute;inset:0;background-size:cover;background-position:center}
+  .mag .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 35%,rgba(0,0,0,.75) 70%,rgba(0,0,0,.92) 100%)}
+  .mag .in{justify-content:flex-end;padding-bottom:6cqw}
+  .mag .in>*:not(.ph):not(.dtop){position:relative;z-index:1}
+  .mag .dtop{position:absolute;left:0;right:0;top:36%;transform:translateY(-50%);z-index:1;text-align:center;font-variant-numeric:tabular-nums}
+  .mag .dtop b{display:inline-block;font-size:11cqw;font-weight:900;letter-spacing:-.03em;line-height:1.1;color:var(--dc,#ffd43b);text-shadow:0 .5cqw 3cqw rgba(0,0,0,.75)}
+  .mag .dtop small{display:table;margin:2.2cqw auto 0;font-size:3.6cqw;font-weight:900;color:#fff;background:var(--hot,#ff3d6e);padding:1cqw 3cqw;border-radius:99cqw}
+  .mag.boxed .dtop b{color:#fff;background:var(--hot,#ff3d6e);padding:1cqw 4cqw;border-radius:2.4cqw;text-shadow:none}
+  .mag.boxed .dtop small{background:rgba(0,0,0,.6)}
+  .mag .ph::before{content:"";position:absolute;left:0;right:0;top:0;height:30%;background:linear-gradient(to bottom,rgba(0,0,0,.55),rgba(0,0,0,0));z-index:1}
+  .mag .cx{font-size:3cqw;font-weight:800;color:#d9d9d9}
+  .mag .hl{margin-top:1.6cqw;font-size:8.6cqw;font-weight:900;line-height:1.18;letter-spacing:-.05em;color:#fff;white-space:pre-line}
+  .mag .sb2{margin-top:2.2cqw;font-size:3.4cqw;font-weight:800;color:var(--hot,#ff5a6e)}
+  .mag .hd{margin-top:5cqw;display:flex;align-items:center;gap:2cqw;font-size:2.8cqw;font-weight:700;color:#cfcfcf}
+  .mag .hd i{display:block;width:7cqw;height:.5cqw;background:#fff}
+  /* 글자만 있는 표지: 날짜 + 브리핑 이름 + 그날 뉴스로 쓴 궁금증 문구 */
+  .title .dt{margin-top:11cqw;font-size:9.6cqw;font-weight:900;color:var(--mark);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .title .nm{font-size:7.4cqw;font-weight:900;letter-spacing:-.045em;margin-top:1.2cqw}
+  .title .bar{width:14cqw;height:1.1cqw;background:var(--mark);border-radius:1cqw;margin-top:8cqw}
+  .title .hk{font-size:9cqw;font-weight:900;line-height:1.22;letter-spacing:-.05em;margin-top:5cqw;white-space:pre-line;text-wrap:balance}
+  .title .foot{margin-top:3cqw}
+  .title .go{margin-top:auto;font-size:3.6cqw;font-weight:800;color:var(--dim)}
   .foot{margin-top:auto;padding-top:2.6cqw;display:flex;justify-content:space-between;align-items:flex-end;gap:3cqw;font-size:2.4cqw;color:var(--dim);font-weight:700;line-height:1.4}
   .foot span:last-child{white-space:nowrap}
   .cover .foot,.outro .foot{margin-top:3cqw}
@@ -232,6 +269,19 @@
     schedule: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="sched">${c.items.map(x => `
       <div class="sc"><div class="tm">${esc(x.time)}</div><div class="it">${esc(x.item)}</div>${x.region ? `<span class="rg">${esc(x.region)}</span>` : '<span></span>'}</div>`).join('')}</div>${foot(c)}`,
 
+    photo: c => `<div class="ph" style="background-image:url('${esc(c.photo)}')"></div>
+      <div class="tp"><span><b>마켓바이탈</b> · ${esc(c.date)} ${esc(c.name)}</span><span class="num">${esc(c.page)}</span></div>
+      <div class="hl">${c.tag ? `<em>${esc(c.tag)}</em> ` : ''}${esc(c.hook)}</div>
+      <div class="sb2">${esc(c.sub)}</div><div class="sw">옆으로 넘겨보세요</div>`,
+
+    mag: c => `<div class="ph" style="background-image:url('${esc(c.photo)}')"></div>
+      <div class="cx">${esc(c.context)}</div><div class="hl">${esc(c.hook)}</div><div class="sb2">${esc(c.sub)}</div>
+      <div class="hd"><i></i>${esc(D.handle)}</div>${c.top ? `<div class="dtop num"><b>${esc(c.top)}</b><small>${esc(c.topSub || '')}</small></div>` : ''}`,
+
+    title: c => `${top(c)}<div class="dt num">${esc(c.date)}</div><div class="nm">${esc(c.name)}</div>
+      <div class="bar"></div><div class="hk">${esc(c.hook)}</div><div class="go">${esc(c.go)}</div>
+      <div class="foot"><span>${esc(D.handle)}</span><span class="num">${esc(c.page)}</span></div>`,
+
     results: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="res">${c.items.map(x => `
       <div class="rs"><span class="rg">${esc(x.region)}</span><div class="it">${esc(x.item)}</div><div class="ac num">${esc(x.actual)}</div>
       <div class="fp num">예상 ${esc(x.forecast || '-')} · 이전 ${esc(x.previous || '-')}${x.tag ? `<span class="tg">${esc(x.tag)}</span>` : ''}</div></div>`).join('')}</div>
@@ -246,7 +296,7 @@
   };
 
   document.getElementById('deck').innerHTML = D.cards.map(c =>
-    `<section class="card ${c.type}${c.why ? ' has-why' : ''}"><div class="in">${R[c.type](c)}</div></section>`).join('');
+    `<section class="card ${c.type}${c.why ? ' has-why' : ''}${c.style ? ' ' + c.style : ''}"><div class="in">${R[c.type](c)}</div></section>`).join('');
   document.documentElement.dataset.ready = '1';
 })();
 </script>

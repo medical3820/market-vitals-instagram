@@ -10,6 +10,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { resultsItems, srcUnion, countryItems, wonCrossRows } from "./global.mjs";
 import { pickTheme } from "./themes.mjs";
+import { coverCard } from "./cover.mjs";
 import { seriesNo, lifeLine, hashtags, firstComment as engageComment, pmReel } from "./engage.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -59,15 +60,12 @@ const st = kospi.foreignStreak;
 const streak = Math.abs(st) >= 2 ? `외국인 ${Math.abs(st)}거래일 연속 ${st < 0 ? "순매도" : "순매수"}` : `외국인 ${eok(kospi.foreign).replace(/^[+-]/, "")} ${flowWord(kospi.foreign)}`;
 
 // 1 커버
-cards.push({ type: "cover", label: "마켓바이탈 마감",
-  headline: `코스피 ${Math.abs(kospi.chg).toFixed(2)}% ${dirWord(kospi.chg)} 마감\n${streak.replace("거래일", "일")}`,
-  sub: "오늘 장 마감 정리 · 옆으로 넘겨 보세요",
-  tiles: [
-    { name: `코스피 · ${md(DATE)} 마감`, value: num(kospi.close), chg: kospi.chg },
-    kosdaq ? { name: `코스닥 · ${md(DATE)} 마감`, value: num(kosdaq.close), chg: kosdaq.chg } : { name: "코스닥", value: "-", chg: null },
-    ok(krw) ? { name: `원/달러 · ${hm}`, value: num(krw.price), chg: krw.chg } : { name: "원/달러", value: "-", chg: null },
-    ok(es) ? { name: `S&P 500 선물 · ${hm}`, value: num(es.price), chg: es.chg } : { name: "S&P 500 선물", value: "-", chg: null },
-  ] });
+// 잡지형 표지 (scripts/cover.mjs): 문구는 inbox.cover, 없거나 규칙 미달이면 숫자 문구
+cards.push(coverCard({ root: ROOT, date: DATE, pm: true, inboxCover: inbox.cover, warnings, mood: kospi.chg >= 0 ? "up" : "down",
+  fallback: { context: `오늘 국내 증시 · ${md(DATE)} 마감`,
+    hook: [`코스피 ${Math.abs(kospi.chg).toFixed(2)}% ${dirWord(kospi.chg)}`, streak.replace("거래일", "일")],
+    sub: "오늘 장 숫자 정리 · 옆으로 넘겨보세요" } }));
+
 
 // 2 국내 마감·수급
 const flow = (mk, r) => r && ({ market: mk, items: [

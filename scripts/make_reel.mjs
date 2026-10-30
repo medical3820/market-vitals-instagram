@@ -21,7 +21,7 @@ const FFMPEG = process.env.FFMPEG || "ffmpeg";
 const STORY_ONLY = process.env.STORY_ONLY === "1" || data.mode === "pm"; // 저녁은 스토리만 (릴스는 하루 한 번, 아침)
 
 // 릴스에 넣을 카드: 커버 → 해외뉴스 → 미국 → 금리·환율 → 국내 수급 → 일정 → 마무리 (있는 것만)
-const ORDER = [["cover", 3.2], ["news:해외 경제뉴스", 2.8], ["rows:미국 증시", 2.6], ["rows:금리 · 환율 · 원자재", 2.6], ["flows", 2.8], ["schedule", 2.4], ["outro", 1.8]];
+const ORDER = [["mag", 3.2], ["cover", 3.2], ["news:해외 경제뉴스", 2.8], ["rows:미국 증시", 2.6], ["rows:금리 · 환율 · 원자재", 2.6], ["flows", 2.8], ["schedule", 2.4], ["outro", 1.8]];
 const picks = [];
 for (const [key, sec] of ORDER) {
   const [type, label] = key.split(":");

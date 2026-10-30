@@ -14,6 +14,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { resultsItems, srcUnion, countryItems, wonCrossRows } from "./global.mjs";
 import { pickTheme } from "./themes.mjs";
+import { coverCard } from "./cover.mjs";
 import { seriesNo, lifeLine, hashtags, firstComment as engageComment, amReel } from "./engage.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
@@ -74,17 +75,16 @@ const ups = idx3.filter((x) => x.chg > 0).length;
 const usLine = ups === 3 ? "뉴욕 3대 지수 모두 상승" : ups === 0 ? "뉴욕 3대 지수 모두 하락" : "뉴욕 3대 지수 혼조";
 const krLine = `코스피 ${Math.abs(kospi.chg).toFixed(2)}% ${kospi.chg >= 0 ? "상승" : "하락"}`;
 const krw = market.macro.find((x) => x.symbol === "KRW=X");
-cards.push({
-  type: "cover", label: "마켓바이탈",
-  headline: `${usLine}\n${krLine}`,
-  sub: "개장 전 시장 요약 · 옆으로 넘겨 보세요",
-  tiles: [
-    { name: `S&P 500 · ${md(usDate)}`, value: fmtVal(spx), chg: spx.chg },
-    { name: `코스피 · ${md(kospi.date)}`, value: num(kospi.close), chg: kospi.chg },
-    ok(krw) ? { name: `원/달러 · ${fetchedHM}`, value: num(krw.price), chg: krw.chg } : { name: "원/달러", value: "-", chg: null },
-    ok(vix) ? { name: `VIX · ${md(vix.date)}`, value: fmtVal(vix), chg: vix.chg } : { name: "VIX", value: "-", chg: null },
-  ],
-});
+// 잡지형 표지 (scripts/cover.mjs): 문구는 inbox.cover, 없거나 규칙 미달이면 숫자 문구
+{
+  const big = [...idx3].sort((a, b) => Math.abs(b.chg) - Math.abs(a.chg))[0];
+  const head = ((inbox.global || [])[0]?.h || "").split(/[,…]/)[0].trim();
+  cards.push(coverCard({ root: ROOT, date: DATE, pm: false, inboxCover: inbox.cover, warnings,
+    mood: idx3.reduce((t, x) => t + (x.chg || 0), 0) >= 0 ? "up" : "down",
+    fallback: { context: `간밤 뉴욕 · ${usLine.replace("뉴욕 ", "")}`,
+      hook: [`${big.name} ${Math.abs(big.chg).toFixed(2)}% ${big.chg >= 0 ? "상승" : "하락"}`, head && head.length <= 13 ? head : krLine],
+      sub: "개장 전 꼭 볼 숫자 · 옆으로 넘겨보세요" } }));
+}
 
 // 뉴스 카드 공통: 금지 표현이 있는 항목은 뺀다
 const BANNED0 = ["추천", "수혜", "목표가", "목표주가", "매수 의견", "매도 의견", "팔아라","급등주", "대장주", "테마주", "관련주", "유망", "호재", "악재", "특징주"];

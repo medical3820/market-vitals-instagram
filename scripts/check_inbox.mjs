@@ -69,5 +69,16 @@ if (j.countries != null) {
   }
 }
 
+if (j.cover != null) {
+  const c = j.cover, hook = Array.isArray(c.hook) ? c.hook : [];
+  const TOPICS = ["semis", "bigtech_ai", "fed_rates", "bonds", "dollar_fx", "yen_japan", "china", "europe", "oil", "gold", "trade_tariff", "crypto", "kospi_up", "kospi_down", "us_up", "us_down"];
+  const CBAN = [...BANNED, "사라", "사야", "팔아야", "기회", "대박", "확실"];
+  if (!c.context || c.context.length > 20) problems.push("cover.context: 1~20자");
+  if (!hook.length || hook.length > 2 || hook.some((l) => !l || l.length > 13)) problems.push("cover.hook: 1~2줄 배열, 줄마다 13자 이내");
+  if ((c.sub || "").length > 30) problems.push("cover.sub: 30자 이내");
+  if (c.topic && !TOPICS.includes(c.topic)) problems.push(`cover.topic: ${TOPICS.join(", ")} 중 하나`);
+  const bad = CBAN.filter((b) => [c.context, ...hook, c.sub].join(" ").includes(b)); if (bad.length) problems.push(`cover: 쓰면 안 되는 표현 (${bad.join(", ")})`);
+}
+
 if (problems.length) { console.error("고칠 점:\n- " + problems.join("\n- ")); process.exit(1); }
 console.log("통과: " + file);
