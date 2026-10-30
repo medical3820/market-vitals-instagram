@@ -193,6 +193,12 @@
   .title .hk{font-size:9cqw;font-weight:900;line-height:1.22;letter-spacing:-.05em;margin-top:5cqw;white-space:pre-line;text-wrap:balance}
   .title .foot{margin-top:3cqw}
   .title .go{margin-top:auto;font-size:3.6cqw;font-weight:800;color:var(--dim)}
+  /* 마지막 카드 하단 띠: 다음 게시물 예고 + 팔로우 안내 */
+  .cta{margin-top:auto;border:.4cqw solid var(--mark);border-radius:2.6cqw;padding:2.4cqw 3.4cqw;display:flex;flex-direction:column;gap:.6cqw}
+  .cta b{font-size:3.6cqw;font-weight:900;color:var(--fg)}
+  .cta span{font-size:2.9cqw;font-weight:800;color:var(--mark)}
+  .cta + .foot{margin-top:2.2cqw}
+  .outro:has(.cta) .handle{display:none}
   .foot{margin-top:auto;padding-top:2.6cqw;display:flex;justify-content:space-between;align-items:flex-end;gap:3cqw;font-size:2.4cqw;color:var(--dim);font-weight:700;line-height:1.4}
   .foot span:last-child{white-space:nowrap}
   .cover .foot,.outro .foot{margin-top:3cqw}
@@ -295,8 +301,11 @@
       <div class="handle">${esc(D.handle)}</div><div class="foot"><span></span><span class="num">${esc(c.page)}</span></div>`,
   };
 
-  document.getElementById('deck').innerHTML = D.cards.map(c =>
-    `<section class="card ${c.type}${c.why ? ' has-why' : ''}${c.style ? ' ' + c.style : ''}"><div class="in">${R[c.type](c)}</div></section>`).join('');
+  document.getElementById('deck').innerHTML = D.cards.map(c => {
+    let h = R[c.type](c);
+    if (c.cta) { const k = h.lastIndexOf('<div class="foot">'); const band = `<div class="cta"><b>${esc(c.cta.t)}</b><span>${esc(c.cta.s)}</span></div>`; h = k >= 0 ? h.slice(0, k) + band + h.slice(k) : h + band; }
+    return `<section class="card ${c.type}${c.why ? ' has-why' : ''}${c.style ? ' ' + c.style : ''}"><div class="in">${h}</div></section>`;
+  }).join('');
   document.documentElement.dataset.ready = '1';
 })();
 </script>

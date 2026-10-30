@@ -42,9 +42,9 @@ try {
   if (overflow.length) {
     await page.evaluate((ns) => ns.forEach((n) => document.querySelectorAll(".card")[n - 1].classList.add("squeeze")), overflow);
     overflow = await over();
-    if (overflow.length) {
-      await page.evaluate((ns) => ns.forEach((n) => document.querySelectorAll(".card")[n - 1].querySelector(".why")?.remove()), overflow);
-      console.warn(`주의: ${overflow.join(", ")}번 카드는 공간이 모자라 '왜?' 한 줄을 뺐습니다.`);
+    for (let pass = 0; pass < 2 && overflow.length; pass++) { // '왜?' 한 줄 → 예고 띠 순서로 하나씩 뺀다
+      await page.evaluate((ns) => ns.forEach((n) => { const c = document.querySelectorAll(".card")[n - 1]; (c.querySelector(".why") || c.querySelector(".cta"))?.remove(); }), overflow);
+      console.warn(`주의: ${overflow.join(", ")}번 카드는 공간이 모자라 '왜?' 한 줄 또는 예고 띠를 뺐습니다.`);
       overflow = await over();
     }
   }

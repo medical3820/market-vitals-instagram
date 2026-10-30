@@ -104,7 +104,7 @@ const ctaHTML = `<!doctype html><meta charset="utf-8">${FONT}<style>${BASE}
 .c b{color:#fff;font-size:76px;font-weight:900;letter-spacing:-.04em;line-height:1.2;text-shadow:0 4px 24px rgba(0,0,0,.6)}
 .c span{color:#0e3b2e;background:#7ff0bf;font-size:52px;font-weight:900;padding:18px 40px;border-radius:999px}
 .c small{color:#fff;font-size:38px;font-weight:700;opacity:.9;text-shadow:0 2px 12px rgba(0,0,0,.6)}
-</style><div class="f"><div class="c"><b>전체 카드와 출처는<br>피드 게시물에서</b><span>@market.vitals 팔로우</span><small>평일 아침·저녁, 같은 지표를 같은 순서로</small></div></div>`;
+</style><div class="f"><div class="c"><b>전체 카드와 출처는<br>피드 게시물에서</b><span>@market.vitals 팔로우</span><small>평일 아침 7시 · 저녁 5시 40분 업데이트</small></div></div>`;
 
 const browser = await chromium.launch(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {});
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
@@ -179,7 +179,8 @@ const caption = (R0 ? [
   "",
   ...R0.points,
   "",
-  "뉴스·수급·일정 전체 카드와 출처는 프로필 피드 게시물에서 확인하세요. 저장해 두면 다시 보기 편합니다.",
+  "뉴스·수급·일정 전체 카드와 출처는 프로필 피드 게시물에서 확인하세요.",
+  "평일 아침 7시·저녁 5시 40분, 시장 숫자를 15초로 정리합니다. 놓치지 않으려면 @market.vitals 팔로우.",
   "",
   "종목 추천을 하지 않습니다. 수치는 카드에 표기된 시점 기준이며, 투자 판단과 책임은 본인에게 있습니다.",
   "운영자는 카드에 언급된 종목을 보유하고 있을 수 있습니다.",
