@@ -147,6 +147,15 @@
   .ct b{font-size:3.6cqw;font-weight:900;color:var(--mark)}
   .ct span{font-size:3.5cqw;font-weight:700;line-height:1.4}
   .ct small{grid-column:2;font-size:2.3cqw;color:var(--dim);font-weight:700}
+  /* 행이 많고 '왜?'까지 있는 카드 */
+  .has-why .rows.dense .row{padding:.75cqw 0}
+  .has-why .grp{margin-top:2.6cqw}
+  /* 렌더러가 넘침을 감지하면 붙이는 한 단계 더 촘촘한 모양 */
+  .squeeze .h{font-size:5.6cqw;margin-top:3cqw}
+  .squeeze .rows .row,.squeeze .rows.tight .row,.squeeze .rows.dense .row{padding:.6cqw 0}
+  .squeeze .grp{margin-top:2cqw}
+  .squeeze .nw{padding:1.8cqw 0}
+  .squeeze .why{margin-top:1.8cqw;padding:1.8cqw 3cqw}
   .foot{margin-top:auto;padding-top:2.6cqw;display:flex;justify-content:space-between;align-items:flex-end;gap:3cqw;font-size:2.4cqw;color:var(--dim);font-weight:700;line-height:1.4}
   .foot span:last-child{white-space:nowrap}
   .cover .foot,.outro .foot{margin-top:3cqw}

@@ -36,7 +36,18 @@ try {
     [...document.fonts].some((f) => f.family.replace(/"/g, "") === "Gothic A1" && f.status === "loaded"));
   if (!fontOk) throw new Error("Gothic A1 글꼴을 불러오지 못했습니다 (Google Fonts 연결 확인).");
 
-  const overflow = await page.$$eval(".card .in", (els) => els.map((el, i) => (el.scrollHeight > el.clientHeight + 2 ? i + 1 : 0)).filter(Boolean));
+  const over = () => page.$$eval(".card .in", (els) => els.map((el, i) => (el.scrollHeight > el.clientHeight + 2 ? i + 1 : 0)).filter(Boolean));
+  // 넘치는 카드는 1) 한 단계 촘촘하게(squeeze), 2) 그래도 넘치면 '왜?' 한 줄을 빼고 다시 확인한다 — 카드 한 장 때문에 발행 전체가 멈추지 않게
+  let overflow = await over();
+  if (overflow.length) {
+    await page.evaluate((ns) => ns.forEach((n) => document.querySelectorAll(".card")[n - 1].classList.add("squeeze")), overflow);
+    overflow = await over();
+    if (overflow.length) {
+      await page.evaluate((ns) => ns.forEach((n) => document.querySelectorAll(".card")[n - 1].querySelector(".why")?.remove()), overflow);
+      console.warn(`주의: ${overflow.join(", ")}번 카드는 공간이 모자라 '왜?' 한 줄을 뺐습니다.`);
+      overflow = await over();
+    }
+  }
   if (overflow.length) {
     const msg = `글이 카드 밖으로 넘칩니다: ${overflow.join(", ")}번 카드`;
     if (process.env.ALLOW_OVERFLOW !== "1") throw new Error(msg); // 디자인 점검용 예외

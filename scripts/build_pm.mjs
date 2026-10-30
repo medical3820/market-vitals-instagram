@@ -145,6 +145,14 @@ newsCard("해외 경제뉴스", "오늘의 해외\n경제 소식", inbox.global)
 // 8 마무리
 cards.push({ type: "outro", label: "마켓바이탈", lead: "평일 아침엔 개장 전 요약,\n저녁엔 장 마감 정리를\n기록합니다.", rules: ["종목 추천을 하지 않습니다", "모든 수치는 표기된 시점 기준입니다", "투자 판단과 책임은 본인에게 있습니다"] });
 
+// 인스타 API 캐러셀은 최대 10장. 넘치면 덜 중요한 카드부터 뺀다 (순서: outro → countries → results)
+for (const t of ["outro","countries","results"]) {
+  if (cards.length <= 10) break;
+  const i = cards.findIndex((c) => c.type === t);
+  if (i >= 0) { skipped.push(`${cards[i].label}: 10장 제한으로 제외`); cards.splice(i, 1); }
+}
+if (cards.length > 10) fail(`카드가 ${cards.length}장입니다 (최대 10장).`);
+
 // 캡션 (아침 캡션과 달라야 중복으로 걸리지 않는다)
 const sign = (v) => (v > 0 ? "▲" : v < 0 ? "▼" : "");
 const tonight = cards.find((c) => c.type === "schedule");

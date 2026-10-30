@@ -244,6 +244,14 @@ cards.push({ type: "outro", label: "마켓바이탈",
   lead: "매일 개장 전,\n같은 지표를 같은 순서로\n기록합니다.",
   rules: ["종목 추천을 하지 않습니다", "모든 수치는 표기된 시점 기준입니다", "투자 판단과 책임은 본인에게 있습니다"] });
 
+// 인스타 API 캐러셀은 최대 10장. 넘치면 덜 중요한 카드부터 뺀다 (순서: outro → bars → countries)
+for (const t of ["outro","bars","countries"]) {
+  if (cards.length <= 10) break;
+  const i = cards.findIndex((c) => c.type === t);
+  if (i >= 0) { skipped.push(`${cards[i].label}: 10장 제한으로 제외`); cards.splice(i, 1); }
+}
+if (cards.length > 10) fail(`카드가 ${cards.length}장입니다 (최대 10장).`);
+
 // ── 캡션 ──────────────────────────────────────────────────────────────
 const NO = seriesNo(ROOT, DATE, false);
 const life = lifeLine(krw);
