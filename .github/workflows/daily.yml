@@ -11,6 +11,7 @@ on:
     paths:
       - "inbox/*.json"
       - "!inbox/*-pm.json"   # 저녁 뉴스는 evening.yml 이 맡는다
+      - "!inbox/*-weekly.json"   # 일요일 주간 뉴스는 weekly_news.yml 이 맡는다
   workflow_dispatch:
     inputs:
       date:

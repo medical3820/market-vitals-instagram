@@ -7,13 +7,15 @@ import { readFileSync } from "node:fs";
 const file = process.argv[2];
 if (!file) { console.error("사용: node scripts/check_inbox.mjs inbox/<날짜>.json"); process.exit(1); }
 const problems = [];
+const WEEKLY = /-weekly\.json$/.test(file);
 let j;
 try { j = JSON.parse(readFileSync(file, "utf8")); } catch (e) { console.error("JSON 형식 오류: " + e.message); process.exit(1); }
 
 const BANNED = ["추천", "수혜", "목표가", "목표주가", "매수 의견", "매도 의견", "팔아라", "급등주", "대장주", "테마주", "관련주", "유망", "호재", "악재", "특징주"];
 const news = (key, label) => {
   const list = j[key];
-  if (!Array.isArray(list) || list.length < 2 || list.length > 3) { problems.push(`${label}: 2~3건이어야 합니다 (현재 ${Array.isArray(list) ? list.length : 0}건)`); return; }
+  const MAX = WEEKLY ? 5 : 3; // 일요일 주간 뉴스는 5건까지
+  if (!Array.isArray(list) || list.length < 2 || list.length > MAX) { problems.push(`${label}: 2~${MAX}건이어야 합니다 (현재 ${Array.isArray(list) ? list.length : 0}건)`); return; }
   list.forEach((n, i) => {
     const at = `${label} ${i + 1}번`;
     for (const k of ["h", "d", "src"]) if (!n[k] || typeof n[k] !== "string") problems.push(`${at}: ${k} 없음`);
@@ -69,6 +71,14 @@ if (j.countries != null) {
   }
 }
 
+if (WEEKLY) {
+  if (!Array.isArray(j.top3) || j.top3.length < 2 || j.top3.length > 3) problems.push("top3: 2~3건이어야 합니다");
+  else j.top3.forEach((x, i) => {
+    if (!x.t || x.t.length > 34) problems.push(`핵심 ${i + 1}번: t 1~34자`);
+    if (!/[·,]/.test(x.src || "")) problems.push(`핵심 ${i + 1}번: 출처 두 곳 이상`);
+    const bad = BANNED.filter((b) => (x.t || "").includes(b)); if (bad.length) problems.push(`핵심 ${i + 1}번: 쓰면 안 되는 표현 (${bad.join(", ")})`);
+  });
+}
 if (j.cover != null) {
   const c = j.cover, hook = Array.isArray(c.hook) ? c.hook : [];
   const TOPICS = ["semis", "bigtech_ai", "fed_rates", "bonds", "dollar_fx", "yen_japan", "china", "europe", "oil", "gold", "trade_tariff", "crypto", "kospi_up", "kospi_down", "us_up", "us_down"];

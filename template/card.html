@@ -269,7 +269,7 @@
       }).join('')}</div>${why(c)}${foot(c)}`,
 
     news: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="news">${c.items.map((n, i) => `
-      <div class="nw"><div class="n num">${i + 1}</div><div><div class="hh">${esc(n.h)}</div>
+      <div class="nw"><div class="n num">${(c.start || 0) + i + 1}</div><div><div class="hh">${esc(n.h)}</div>
       <div class="d">${esc(n.d)}</div><div class="s">출처: ${esc(n.src)}${n.time ? ' · ' + esc(n.time) : ''}</div></div></div>`).join('')}</div>${foot(c)}`,
 
     schedule: c => `${top(c)}<div class="h">${esc(c.title)}</div><div class="sched">${c.items.map(x => `

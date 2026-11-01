@@ -1,0 +1,130 @@
+name: 주간 뉴스 발행
+
+# 흐름: 클라우드 예약 작업(일 10:00 KST)이 그 주 아침·저녁 뉴스에서 골라 inbox/<일요일>-weekly.json 을 push
+#   → 카드 만들기·검사 → 렌더링 → 캐러셀 + 스토리(표지) 발행
+# 커밋 메시지에 [연습] 이 있으면 카드만 만든다. 수동 실행 기본도 '만들어 보기'.
+
+on:
+  push:
+    paths:
+      - "inbox/*-weekly.json"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "일요일 날짜 YYYY-MM-DD (비우면 오늘, 한국 시간)"
+        required: false
+        default: ""
+      publish:
+        description: "true 면 인스타에 실제 발행. 기본은 카드만 만들어 보기"
+        required: false
+        default: "false"
+
+concurrency:
+  group: market-vitals
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  weekly_news:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PUBLISH: ${{ (github.event_name == 'push' && !contains(github.event.head_commit.message, '[연습]')) || github.event.inputs.publish == 'true' }}
+      DATE: ${{ github.event.inputs.date }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: 예약 작업이 올린 뉴스 파일 가져오기
+        if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+        run: git checkout "${{ github.sha }}" -- inbox/
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 도구 설치 (명령마다 7분 제한, 멈추면 최대 3번 다시 시도)
+        timeout-minutes: 15
+        run: |
+          try() { for i in 1 2 3; do timeout 420 "$@" && return 0; echo "다시 시도 $i: $*"; sleep 5; done; return 1; }
+          try npm ci --no-audit --no-fund
+          try npx playwright install --with-deps chromium
+          try sudo apt-get install -y fonts-noto-cjk ffmpeg > /dev/null
+
+      - name: 토큰·계정 확인 (게시물은 올리지 않음)
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          EXPECT_USERNAME: market.vitals
+        run: node scripts/check_token.mjs
+
+      - name: 주간 뉴스 카드 만들기·검사
+        id: build
+        env:
+          BLOCKLIST: ${{ secrets.BLOCKLIST }}
+        run: node scripts/weekly_news.mjs
+
+      - name: 이미 발행한 주인지 확인
+        id: dup
+        run: |
+          if grep -q "^${{ steps.build.outputs.folder }} " published.txt; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "이미 발행된 주간 뉴스입니다. 다시 올리지 않습니다."
+          fi
+
+      - name: 이미지 렌더링
+        run: node scripts/render.mjs "${{ steps.build.outputs.folder }}"
+
+      - name: 스토리 만들기 (실패해도 캐러셀은 계속)
+        id: story
+        continue-on-error: true
+        run: node scripts/make_reel.mjs "${{ steps.build.outputs.folder }}"
+
+      - name: 카드 이미지 보관
+        uses: actions/upload-artifact@v4
+        with:
+          name: weekly-news-${{ steps.build.outputs.folder }}
+          path: |
+            posts/${{ steps.build.outputs.folder }}/
+            posts/${{ steps.build.outputs.folder }}_S/
+
+      - name: 저장소에 올리기
+        if: env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add posts/ inbox/
+          git commit -m "주간 뉴스 카드 ${{ steps.build.outputs.folder }}" || true
+          git pull --rebase -q origin main
+          git push origin main
+          sleep 20
+
+      - name: 인스타 발행
+        if: env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true'
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
+        run: python3 scripts/publish.py "${{ steps.build.outputs.folder }}"
+
+      - name: 스토리 발행 (실패해도 계속)
+        if: env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true' && steps.story.outcome == 'success'
+        continue-on-error: true
+        env:
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          RAW_BASE: https://raw.githubusercontent.com/${{ github.repository }}/main
+        run: python3 scripts/publish.py "${{ steps.build.outputs.folder }}_S"
+
+      - name: 발행 기록 올리기
+        if: always() && env.PUBLISH == 'true' && steps.dup.outputs.skip != 'true'
+        run: |
+          git add published.txt
+          git diff --cached --quiet && exit 0
+          git commit -m "발행 기록 ${{ steps.build.outputs.folder }}"
+          git pull --rebase -q origin main
+          git push origin main
