@@ -8,7 +8,7 @@ import { writeFileSync, mkdirSync, appendFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { THEMES } from "./themes.mjs";
-import { koTitle, keepEvent } from "./calendar_map.mjs";
+import { koTitle, keepEvent, nextWeekRaw } from "./calendar_map.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36";
@@ -57,7 +57,7 @@ async function daumWeek(market) {
 
 async function nextWeekEvents() {
   try {
-    const list = await getJSON("https://nfs.faireconomy.media/ff_calendar_nextweek.json");
+    const list = await nextWeekRaw(FRI);
     const seen = new Map();
     for (const e of list) {
       if (!keepEvent(e)) continue;

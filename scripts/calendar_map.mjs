@@ -26,3 +26,22 @@ export const koTitle = (t) => {
 export const keepEvent = (e) => REGION[e.country] && (e.impact === "High" || (e.country === "USD" && e.impact === "Medium"));
 // 비교 기준 꼬리표 (m/m → 전월비). 같은 지표의 전월비·전년비를 구분할 때 쓴다.
 export const periodOf = (t) => ({ "m/m": "전월비", "y/y": "전년비", "q/q": "전분기비" })[(t.match(/(m\/m|y\/y|q\/q)$/) || [])[1]] || "";
+
+// 다음 주(금요일 FRI 기준 월~금, 한국 시간) 원본 일정 목록. 주말엔 nextweek 파일이 없고(404) thisweek 에 다음 주가 들어 있어 둘 다 읽어 합친다.
+export async function nextWeekRaw(fri) {
+  const from = new Date(new Date(fri + "T00:00:00+09:00").getTime() + 3 * 864e5); // 다음 주 월 00:00 KST
+  const until = new Date(from.getTime() + 5 * 864e5); // 토 00:00 KST
+  const out = [], seen = new Set();
+  for (const f of ["thisweek", "nextweek"]) {
+    try {
+      const r = await fetch(`https://nfs.faireconomy.media/ff_calendar_${f}.json`, { headers: { "User-Agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(20000) });
+      if (!r.ok) continue;
+      for (const e of await r.json()) {
+        const t = new Date(e.date), k = e.date + e.country + e.title;
+        if (t >= from && t < until && !seen.has(k)) { seen.add(k); out.push(e); }
+      }
+    } catch { /* 한쪽이 없어도 다른 쪽으로 */ }
+  }
+  if (!out.length) throw new Error("다음 주 일정 없음");
+  return out;
+}

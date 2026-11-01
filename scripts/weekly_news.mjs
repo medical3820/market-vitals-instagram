@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { THEMES } from "./themes.mjs";
 import { coverCard } from "./cover.mjs";
-import { koTitle, keepEvent, REGION } from "./calendar_map.mjs";
+import { koTitle, keepEvent, REGION, nextWeekRaw } from "./calendar_map.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const DATE = (process.env.DATE || "").trim() || new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Seoul" }).format(new Date());
@@ -39,8 +39,7 @@ if (g.length + d.length < 4) fail("뉴스가 4건 미만입니다.");
 // 다음 주 경제 일정 (경제 캘린더)
 async function nextWeek() {
   try {
-    const r = await fetch("https://nfs.faireconomy.media/ff_calendar_nextweek.json", { headers: { "User-Agent": "Mozilla/5.0" }, signal: AbortSignal.timeout(20000) });
-    const list = await r.json(), seen = new Map();
+    const list = await nextWeekRaw(FRI), seen = new Map();
     for (const e of list) {
       if (!keepEvent(e)) continue;
       const name = koTitle(e.title); if (!name) continue;
