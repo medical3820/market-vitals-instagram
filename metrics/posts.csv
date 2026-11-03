@@ -1,7 +1,9 @@
 date,id,type,likes,comments,reach,saved,shares,views,link
-2026-11-03,18440044108199179,VIDEO,0,1,0,0,0,0,https://www.instagram.com/reel/DfQWKlWiaSd/
-2026-11-03,18116247101593928,CAROUSEL_ALBUM,0,1,0,0,0,0,https://www.instagram.com/p/DfQWIRVj-E2/
-2026-11-02,18115917974027827,VIDEO,0,1,96,0,0,100,https://www.instagram.com/reel/DfO5mxukxFu/
+2026-11-03,18130977929492574,VIDEO,0,1,80,0,0,84,https://www.instagram.com/reel/DfRemMyinRA/
+2026-11-03,18095991677172436,CAROUSEL_ALBUM,1,1,1,0,0,3,https://www.instagram.com/p/DfReixpG8Lo/
+2026-11-03,18440044108199179,VIDEO,0,1,141,0,0,149,https://www.instagram.com/reel/DfQWKlWiaSd/
+2026-11-03,18116247101593928,CAROUSEL_ALBUM,2,1,1,0,0,3,https://www.instagram.com/p/DfQWIRVj-E2/
+2026-11-02,18115917974027827,VIDEO,0,1,98,0,0,103,https://www.instagram.com/reel/DfO5mxukxFu/
 2026-11-02,17968019658193629,CAROUSEL_ALBUM,2,1,0,0,0,1,https://www.instagram.com/p/DfO5iwikRCI/
 2026-11-02,17963047554228044,VIDEO,0,1,145,0,0,163,https://www.instagram.com/reel/DfNxl7ygNK6/
 2026-11-02,18129509716881475,CAROUSEL_ALBUM,0,1,2,0,0,5,https://www.instagram.com/p/DfNxiEUD-cD/
@@ -11,8 +13,8 @@ date,id,type,likes,comments,reach,saved,shares,views,link
 2026-10-30,18220092571347702,CAROUSEL_ALBUM,0,1,1,0,0,2,https://www.instagram.com/p/DfHLKkvm2rj/
 2026-10-28,18100245176352164,VIDEO,0,1,100,0,0,106,https://www.instagram.com/reel/DfCBl7uFf4C/
 2026-10-28,17952610143298575,CAROUSEL_ALBUM,1,1,2,0,0,6,https://www.instagram.com/p/DfCBjQIlfvt/
-2026-10-28,18169446112414393,VIDEO,0,1,137,0,0,151,https://www.instagram.com/reel/DfA5Zvnii3n/
-2026-10-28,18575272975077938,CAROUSEL_ALBUM,0,1,2,0,0,2,https://www.instagram.com/p/DfA5VO8lpEb/
+2026-10-28,18169446112414393,VIDEO,0,1,,,,,https://www.instagram.com/reel/DfA5Zvnii3n/
+2026-10-28,18575272975077938,CAROUSEL_ALBUM,0,1,,,,,https://www.instagram.com/p/DfA5VO8lpEb/
 2026-10-27,17963248218243777,VIDEO,0,1,,,,,https://www.instagram.com/reel/De_c0HYkVlJ/
 2026-10-27,18373648771211769,CAROUSEL_ALBUM,0,1,,,,,https://www.instagram.com/p/De_cx_CG01-/
 2026-10-27,18028823855876934,VIDEO,0,1,,,,,https://www.instagram.com/reel/De-UhZRgc_V/
@@ -27,5 +29,3 @@ date,id,type,likes,comments,reach,saved,shares,views,link
 2026-10-22,18093317084690550,VIDEO,0,1,,,,,https://www.instagram.com/reel/DexcjVLDBO5/
 2026-10-22,17931867720163904,CAROUSEL_ALBUM,1,1,,,,,https://www.instagram.com/p/Dexccthn2d_/
 2026-10-21,18235185271321905,VIDEO,0,1,,,,,https://www.instagram.com/reel/Dev_9QTj-do/
-2026-10-21,18137087710635307,CAROUSEL_ALBUM,0,1,,,,,https://www.instagram.com/p/Dev_68SGzsl/
-2026-10-21,18103388075038832,VIDEO,0,1,,,,,https://www.instagram.com/reel/Deu3z79Ck3T/
