@@ -18,7 +18,7 @@ const src = join(ROOT, "posts", id);
 const data = JSON.parse(readFileSync(join(src, "data.json"), "utf8"));
 const T = { bg: "#0e3b2e", panel: "#185040", dim: "#a9d3c2", mark: "#7ff0bf", ...(data.theme || {}) }; // 요일별 배경색 (themes.mjs)
 const FFMPEG = process.env.FFMPEG || "ffmpeg";
-const STORY_ONLY = process.env.STORY_ONLY === "1" || data.mode === "pm" || data.mode === "weekly"; // 저녁은 스토리만 (릴스는 하루 한 번, 아침)
+const STORY_ONLY = process.env.STORY_ONLY === "1" || data.mode === "pm" || data.mode === "weekly" || data.mode === "edu"; // 저녁은 스토리만 (릴스는 하루 한 번, 아침)
 
 // 릴스에 넣을 카드: 커버 → 해외뉴스 → 미국 → 금리·환율 → 국내 수급 → 일정 → 마무리 (있는 것만)
 const ORDER = [["mag", 3.2], ["cover", 3.2], ["news:해외 경제뉴스", 2.8], ["rows:미국 증시", 2.6], ["rows:금리 · 환율 · 원자재", 2.6], ["flows", 2.8], ["schedule", 2.4], ["outro", 1.8]];
@@ -33,7 +33,7 @@ else if (picks.length < 3) { console.error("릴스로 만들 카드가 부족합
 
 const [y, m, d] = data.date.split("-");
 const WD = "일월화수목금토"[new Date(data.date + "T12:00:00+09:00").getUTCDay()];
-const head = `${+m}/${+d}(${WD}) ${data.mode === "pm" ? "장 마감 정리" : data.mode === "weekly" ? "이번 주 경제뉴스 정리" : "개장 전 시장 요약"}`;
+const head = `${+m}/${+d}(${WD}) ${data.mode === "pm" ? "장 마감 정리" : data.mode === "weekly" ? "이번 주 경제뉴스 정리" : data.mode === "edu" ? "1분 경제 공부" : "개장 전 시장 요약"}`;
 
 const frameHTML = (img, foot) => `<!doctype html><meta charset="utf-8">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@700;900&display=swap">
@@ -66,7 +66,7 @@ const frames = [];
 if (STORY_ONLY) {
   const S0 = join(ROOT, "posts", `${id}_S`); mkdirSync(S0, { recursive: true });
   const p = join(work, "story.png");
-  await shot(picks[0].file, data.mode === "pm" ? "오늘 장 마감 카드 전체는 프로필 피드에서" : data.mode === "weekly" ? "이번 주 뉴스 카드 전체는 프로필 피드에서" : "오늘 아침 카드 전체는 프로필 피드에서", p);
+  await shot(picks[0].file, data.mode === "pm" ? "오늘 장 마감 15초 정리는 릴스에서" : data.mode === "weekly" ? "이번 주 뉴스 카드 전체는 프로필 피드에서" : data.mode === "edu" ? "저장해 두고 보는 설명 카드는 피드에서" : "오늘 아침 카드 전체는 프로필 피드에서", p);
   await browser.close();
   execFileSync(FFMPEG, ["-y", "-loglevel", "error", "-i", p, "-q:v", "3", join(S0, "story.jpg")]);
   writeFileSync(join(S0, "post.json"), JSON.stringify({ id: `${id}_S`, story: true, image: "story.jpg" }, null, 2));

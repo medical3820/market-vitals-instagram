@@ -104,7 +104,7 @@ const ctaHTML = `<!doctype html><meta charset="utf-8">${FONT}<style>${BASE}
 .c b{color:#fff;font-size:76px;font-weight:900;letter-spacing:-.04em;line-height:1.2;text-shadow:0 4px 24px rgba(0,0,0,.6)}
 .c span{color:#0e3b2e;background:#7ff0bf;font-size:52px;font-weight:900;padding:18px 40px;border-radius:999px}
 .c small{color:#fff;font-size:38px;font-weight:700;opacity:.9;text-shadow:0 2px 12px rgba(0,0,0,.6)}
-</style><div class="f"><div class="c"><b>전체 카드와 출처는<br>피드 게시물에서</b><span>@market.vitals 팔로우</span><small>평일 아침 7시 · 저녁 5시 40분 업데이트</small></div></div>`;
+</style><div class="f"><div class="c"><b>${data.mode === "pm" ? "내일 아침 7시,<br>간밤 뉴욕 정리" : "전체 카드와 출처는<br>피드 게시물에서"}</b><span>@market.vitals 팔로우</span><small>평일 아침 7시 · 저녁 5시 40분 업데이트</small></div></div>`;
 
 const browser = await chromium.launch(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {});
 const page = await browser.newPage({ viewport: { width: 1080, height: 1920 } });
@@ -179,7 +179,7 @@ const caption = (R0 ? [
   "",
   ...R0.points,
   "",
-  "뉴스·수급·일정 전체 카드와 출처는 프로필 피드 게시물에서 확인하세요.",
+  data.mode === "pm" ? "내일 아침 7시, 간밤 뉴욕과 개장 전 숫자를 카드로 정리해 올립니다." : "뉴스·수급·일정 전체 카드와 출처는 프로필 피드 게시물에서 확인하세요.",
   "평일 아침 7시·저녁 5시 40분, 시장 숫자를 15초로 정리합니다. 놓치지 않으려면 @market.vitals 팔로우.",
   "",
   "종목 추천을 하지 않습니다. 수치는 카드에 표기된 시점 기준이며, 투자 판단과 책임은 본인에게 있습니다.",
@@ -200,5 +200,5 @@ const caption = (R0 ? [
 ]).join("\n");
 mkdirSync(R, { recursive: true });
 for (const f of ["video.mp4", "cover.jpg"]) copyFileSync(join(OUT, f), join(R, f));
-writeFileSync(join(R, "post.json"), JSON.stringify({ id: `${id}_R`, format: "R", caption, first_comment: R0?.comment || "", video: "video.mp4", cover: "cover.jpg", share_to_feed: false }, null, 2));
+writeFileSync(join(R, "post.json"), JSON.stringify({ id: `${id}_R`, format: "R", variant: "v2", caption, first_comment: R0?.comment || "", video: "video.mp4", cover: "cover.jpg", share_to_feed: data.mode === "pm" }, null, 2)); // 저녁은 캐러셀이 없어 릴스를 피드에도
 console.log(`후킹형 릴스 ${segs.length}장면 ${total.toFixed(1)}초 (배경: ${bg.split(/[\\/]/).pop()}, 배경음 ${hasAudio ? "있음" : "없음"}) → posts/${id}_R/`);

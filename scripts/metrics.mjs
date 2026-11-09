@@ -41,17 +41,30 @@ const rows = lines.slice(1).filter((l) => !l.startsWith(now.date + ","));
 rows.push([now.date, now.time, me.followers_count ?? "", me.follows_count ?? "", me.media_count ?? ""].join(","));
 writeFileSync(hist, [header, ...rows].join("\n") + "\n");
 
-// 2) 게시물
-const media = (await api(`${USER}/media`, { fields: "id,timestamp,media_type,like_count,comments_count,permalink", limit: "30" })).data || [];
+// 2) 게시물 — 도달·저장·공유·조회 + 릴스는 평균 시청 시간(초). 어느 형식(variant)인지는 published.txt 의 폴더 → post.json 으로 찾는다.
+const media = (await api(`${USER}/media`, { fields: "id,timestamp,media_type,media_product_type,like_count,comments_count,permalink", limit: "30" })).data || [];
+const folderOf = new Map();
+if (existsSync(join(ROOT, "published.txt"))) for (const l of readFileSync(join(ROOT, "published.txt"), "utf8").split("\n")) {
+  const m = l.match(/^(\S+)\s+media_id=(\d+)/); if (m) folderOf.set(m[2], m[1]);
+}
+const variantOf = (folder) => { try { return JSON.parse(readFileSync(join(ROOT, "posts", folder, "post.json"), "utf8")).variant || ""; } catch { return ""; } };
 let insightsOk = true;
-const METRICS = "reach,saved,shares,views";
 const posts = [];
 for (const m of media) {
-  const row = { date: kst(new Date(m.timestamp)).date, id: m.id, type: m.media_type, likes: m.like_count ?? "", comments: m.comments_count ?? "", reach: "", saved: "", shares: "", views: "", link: m.permalink };
-  if (insightsOk && posts.length < 14) {
+  const folder = folderOf.get(m.id) || "";
+  const row = { date: kst(new Date(m.timestamp)).date, id: m.id, type: m.media_type, folder, variant: folder ? variantOf(folder) : "",
+    likes: m.like_count ?? "", comments: m.comments_count ?? "", reach: "", saved: "", shares: "", views: "", watch_s: "", link: m.permalink };
+  if (insightsOk) {
     try {
-      const ins = await api(`${m.id}/insights`, { metric: METRICS });
+      const ins = await api(`${m.id}/insights`, { metric: "reach,saved,shares,views" });
       for (const x of ins.data || []) row[x.name] = x.values?.[0]?.value ?? x.total_value?.value ?? "";
+      if (m.media_product_type === "REELS") {
+        try {
+          const w = await api(`${m.id}/insights`, { metric: "ig_reels_avg_watch_time" });
+          const ms = w.data?.[0]?.values?.[0]?.value ?? w.data?.[0]?.total_value?.value;
+          if (ms != null) row.watch_s = (ms / 1000).toFixed(1);
+        } catch (e) { console.log("릴스 시청 시간 조회 불가: " + e.message.slice(0, 100)); }
+      }
     } catch (e) {
       insightsOk = false; // 권한(instagram_business_manage_insights)이 없으면 공개 수치만 기록
       console.log("인사이트(도달·저장) 조회 불가 — 공개 수치만 기록합니다: " + e.message.slice(0, 120));
@@ -59,8 +72,18 @@ for (const m of media) {
   }
   posts.push(row);
 }
-const pcols = ["date", "id", "type", "likes", "comments", "reach", "saved", "shares", "views", "link"];
-writeFileSync(join(dir, "posts.csv"), [pcols.join(","), ...posts.map((r) => pcols.map((c) => r[c]).join(","))].join("\n") + "\n");
+const pcols = ["date", "id", "type", "folder", "variant", "likes", "comments", "reach", "saved", "shares", "views", "watch_s", "link"];
+const toCsv = (list) => [pcols.join(","), ...list.map((r) => pcols.map((c) => r[c] ?? "").join(","))].join("\n") + "\n";
+writeFileSync(join(dir, "posts.csv"), toCsv(posts));
+// 누적 기록: 최근 30개를 넘어간 게시물도 남긴다 (같은 id 는 최신 값으로 갱신) — A/B 비교·주간 리포트용
+const logPath = join(dir, "posts_log.csv");
+const log = new Map();
+if (existsSync(logPath)) {
+  const [h, ...ls] = readFileSync(logPath, "utf8").trim().split("\n"); const hc = h.split(",");
+  for (const l of ls) { const v = l.split(","); const r = Object.fromEntries(hc.map((c, k) => [c, v[k]])); log.set(r.id, r); }
+}
+for (const p of posts) log.set(p.id, { ...(log.get(p.id) || {}), ...Object.fromEntries(Object.entries(p).filter(([, v]) => v !== "")) });
+writeFileSync(logPath, toCsv([...log.values()].sort((a, b) => String(b.date).localeCompare(String(a.date)))));
 
 // 3) 요약
 const prev = rows.length > 1 ? rows[rows.length - 2].split(",") : null;
