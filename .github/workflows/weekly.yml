@@ -41,14 +41,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
-      - name: 도구 설치 (명령마다 7분 제한, 멈추면 최대 3번 다시 시도)
+      - name: 도구 설치 (npm 만 — 브라우저는 서버에 깔린 Chrome, ffmpeg 는 npm 패키지. 외부 apt 다운로드 없음)
         timeout-minutes: 15
         run: |
-          try() { for i in 1 2 3; do timeout 420 "$@" && return 0; echo "다시 시도 $i: $*"; sleep 5; done; return 1; }
+          try() { for i in 1 2 3; do timeout 300 "$@" && return 0; echo "다시 시도 $i: $*"; sleep 20; done; return 1; }
           try npm ci --no-audit --no-fund
-          try npx playwright install --with-deps chromium
-          try sudo apt-get install -y fonts-noto-cjk > /dev/null
+          echo "FFMPEG=$(node -p 'require("ffmpeg-static")')" >> "$GITHUB_ENV"
+          echo "FFPROBE=$(node -p 'require("ffprobe-static").path')" >> "$GITHUB_ENV"
+          echo "PW_CHANNEL=chrome" >> "$GITHUB_ENV"
+          google-chrome --version
 
       - name: 토큰·계정 확인 (게시물은 올리지 않음)
         env:
